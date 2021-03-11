@@ -18,6 +18,7 @@
 /app/.env.development.local
 /app/.env.test.local
 /app/.env.production.local
+/app/.eslintcache
 
 /app/npm-debug.log*
 /app/yarn-debug.log*
