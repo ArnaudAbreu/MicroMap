@@ -1,0 +1,6 @@
+# wsi server configuration file
+# root directory of the application
+root: /Users/administrateur/Pictures/FondClair
+# if this has to be accessible from external ip, you should put 0.0.0.0 here.
+ip: 127.0.0.1
+port: 5000
