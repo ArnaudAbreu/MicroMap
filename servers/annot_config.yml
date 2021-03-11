@@ -1,4 +1,7 @@
 # wsi server configuration file
-root: /Users/administrateur/Pictures/FondClair
-ip: 127.0.0.1
-port: 5100
+# Directory with the annotations
+root: ****
+# Ip of host
+ip: ****
+# Port of host
+port: ****
