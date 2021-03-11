@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const ANNOT_URL = process.env.REACT_APP_ANNOT_SERVER_URL;
+
 const AnnotationAPI = axios.create({
-  baseURL: "http://127.0.0.1:5100/",
+  baseURL: ANNOT_URL,
   responseType: "json"
 });
 

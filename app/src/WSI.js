@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const WSI_URL = process.env.REACT_APP_SLIDE_SERVER_URL;
+
 const WSIAPI = axios.create({
-  baseURL: "http://127.0.0.1:5000/",
+  baseURL: WSI_URL,
   responseType: "json"
 });
 
