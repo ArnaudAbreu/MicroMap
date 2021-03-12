@@ -114,7 +114,7 @@ TILERS = {
 def abort_if_slide_does_not_exist(slide_id):
     """Do nothing stupid if the requested slide does not exists."""
     if slide_id not in SLIDES:
-        abort(404, message="Slide {} doesn't exist! See slidenames:\n{}".format(slide_id, SLIDES))
+        abort(404, message="Slide {} doesn't exist! See slidenames: {}".format(slide_id, SLIDES))
 
 
 def abort_if_format_does_not_exist(fmt):
@@ -144,8 +144,9 @@ class PILBytesIO(BytesIO):
 class Slide(Resource):
     """A class to handle slide info requests."""
 
-    def get(self, slide_id):
+    def get(self, slide_ID):
         """Answer GET requests."""
+        slide_id = slide_ID.encode("raw_unicode_escape").decode("utf-8")
         abort_if_slide_does_not_exist(slide_id)
         slide = SLIDES[slide_id]
         res = slide_info_to_dict(slide)
@@ -165,11 +166,12 @@ class SlideList(Resource):
 class Tile(Resource):
     """A class to handle patch requests."""
 
-    def get(self, slide_id, level, col, row, fmt):
+    def get(self, slide_ID, level, col, row, fmt):
         """Answer GET requests."""
         print(
             "Received following request: level: {}, x: {}, y: {}, format: {}".format(level, col, row, fmt)
         )
+        slide_id = slide_ID.encode("raw_unicode_escape").decode("utf-8")
         abort_if_slide_does_not_exist(slide_id)
         slide = TILERS[slide_id]
         fmt = fmt.lower()
