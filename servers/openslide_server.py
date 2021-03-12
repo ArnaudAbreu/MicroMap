@@ -148,9 +148,9 @@ class Slide(Resource):
         """Answer GET requests."""
         print(slide_ID)
         print(type(slide_ID))
-        slide_id = slide_ID.encode("raw_unicode_escape").decode("utf-8")
-        abort_if_slide_does_not_exist(slide_id)
-        slide = SLIDES[slide_id]
+        # slide_id = slide_ID.encode("raw_unicode_escape").decode("utf-8")
+        abort_if_slide_does_not_exist(slide_ID)
+        slide = SLIDES[slide_ID]
         res = slide_info_to_dict(slide)
         res["source"]["Image"]["Url"] = "http://{}:{}/patch/{}/".format(IP, PORT, slide_id)
         res["source"]["Image"]["xmlns"] = "http://schemas.microsoft.com/deepzoom/2008"
@@ -171,7 +171,7 @@ class Tile(Resource):
     def get(self, slide_ID, level, col, row, fmt):
         """Answer GET requests."""
         print(
-            "Received following request: level: {}, x: {}, y: {}, format: {}".format(level, col, row, fmt)
+            "Received following request: level: {}, x: {}, y: {}, format: {}".format(level, col, row, fmt, slide_ID)
         )
         slide_id = slide_ID.encode("raw_unicode_escape").decode("utf-8")
         abort_if_slide_does_not_exist(slide_id)
