@@ -192,10 +192,10 @@ class Tile(Resource):
 
 
 api.add_resource(SlideList, '/slides')
-api.add_resource(Slide, '/slides/<slide_id>')
+api.add_resource(Slide, '/slides/<slide_ID>')
 api.add_resource(
     Tile,
-    '/patch/<slide_id>/<int:level>/<int:col>_<int:row>.<fmt>'
+    '/patch/<slide_ID>/<int:level>/<int:col>_<int:row>.<fmt>'
 )
 
 
