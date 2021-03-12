@@ -114,7 +114,7 @@ TILERS = {
 def abort_if_slide_does_not_exist(slide_id):
     """Do nothing stupid if the requested slide does not exists."""
     if slide_id not in SLIDES:
-        abort(404, message="Slide {} doesn't exist".format(slide_id))
+        abort(404, message="Slide {} doesn't exist! See slidenames:\n{}".format(slide_id, SLIDES))
 
 
 def abort_if_format_does_not_exist(fmt):
