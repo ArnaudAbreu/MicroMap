@@ -146,6 +146,8 @@ class Slide(Resource):
 
     def get(self, slide_ID):
         """Answer GET requests."""
+        print(slide_ID)
+        print(type(slide_ID))
         slide_id = slide_ID.encode("raw_unicode_escape").decode("utf-8")
         abort_if_slide_does_not_exist(slide_id)
         slide = SLIDES[slide_id]
