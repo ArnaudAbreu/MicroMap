@@ -173,9 +173,9 @@ class Tile(Resource):
         print(
             "Received following request: level: {}, x: {}, y: {}, format: {}, slide: {}".format(level, col, row, fmt, slide_ID)
         )
-        slide_id = slide_ID.encode("raw_unicode_escape").decode("utf-8")
-        abort_if_slide_does_not_exist(slide_id)
-        slide = TILERS[slide_id]
+        # slide_id = slide_ID.encode("raw_unicode_escape").decode("utf-8")
+        abort_if_slide_does_not_exist(slide_ID)
+        slide = TILERS[slide_ID]
         fmt = fmt.lower()
         abort_if_format_does_not_exist(fmt)
         try:
