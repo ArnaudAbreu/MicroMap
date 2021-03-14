@@ -27,10 +27,15 @@ const createShapeGetter = (getter, layername) => {
   return (() => {getter(layername)})
 }
 
+// const setLayer = (slidename, layername, shape) => {
+//   const annotation = {annotation:{points: shape,
+//                                   text: "machin",
+//                                   creator: "arnaud"}}
+//   return AnnotationAPI.post("/annotation/" + slidename + "/" + layername, annotation);
+// }
+
 const setLayer = (slidename, layername, shape) => {
-  const annotation = {annotation:{points: shape,
-                                  text: "machin",
-                                  creator: "arnaud"}}
+  const annotation = {annotation: shape};
   return AnnotationAPI.post("/annotation/" + slidename + "/" + layername, annotation);
 }
 

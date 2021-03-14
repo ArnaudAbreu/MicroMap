@@ -6,6 +6,27 @@ import { Annotation } from './Annotation';
 import { AnnotationAPI, getLayer } from './ANNOT';
 
 
+const gdate = () => {
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2, '0');
+  const mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+  const yyyy = today.getFullYear();
+
+  return dd + '/' + mm + '/' + yyyy;
+}
+
+
+const guid = () => {
+    const s4 = () => {
+        return Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1);
+    }
+    //return id of format 'aaaaaaaa'-'aaaa'-'aaaa'-'aaaa'-'aaaaaaaaaaaa'
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+}
+
+
 const rel2abs = (poly, dims) => {
   const listPoints = poly.map((pt) => {
       return(
@@ -27,7 +48,7 @@ const annotationsToShapeList = (annotObjects) => {
       return [];
     }
     else if (annot.hasOwnProperty('points')){
-      return annot.points;
+      return annot;
     } else {
       return [];
     }
@@ -50,6 +71,20 @@ const LayerTest = ({drawing, color, label, pos, send, request}) => {
     setShapeList(annotationsToShapeList(srv_annot));
   }
 
+  const pointsToAnnotationObj = (points) => {
+    const new_idx = guid();
+    const date = gdate();
+    return {
+      points: points,
+      id: new_idx,
+      author: "arnaud",
+      text: "",
+      label: label,
+      color: color,
+      date: date
+    };
+  }
+
   useEffect(() => {
     if (hasNewShapes === false){
       getShapeList();
@@ -57,35 +92,12 @@ const LayerTest = ({drawing, color, label, pos, send, request}) => {
   }, []);
 
   const annotationList = (elements, flying) => {
-    const listItems = elements.map((coords, idx) => {
+    const listItems = elements.map((annot, idx) => {
         return(
           <Annotation
-            points={rel2abs(coords, pos)}
+            points={rel2abs(annot.points, pos)}
             color={color}
-            key={idx}
-          />
-        );
-      }
-    );
-    if (flying.length > 0){
-      listItems.push(
-        <Annotation
-          points={rel2abs(flying, pos)}
-          color={color}
-          key={elements.length}
-        />
-      );
-    }
-    return listItems;
-  }
-
-  const objAnnotationList = (elements, flying) => {
-    const listItems = Object.entries(elements).map((coords, idx) => {
-        return(
-          <Annotation
-            points={rel2abs(coords, pos)}
-            color={color}
-            key={idx}
+            key={annot.id}
           />
         );
       }
@@ -168,10 +180,13 @@ const LayerTest = ({drawing, color, label, pos, send, request}) => {
     if (isDrawing && evt.key === 'Enter') {
       setIsDrawing(false);
       console.log("Finished current shape!", currentShape);
+      // before pushing anything to the list of annotation, we
+      // have to format the annotation
+      const annotobj = pointsToAnnotationObj(currentShape);
       const updatedAnnotations = shapeList.slice();
-      updatedAnnotations.push(currentShape);
+      updatedAnnotations.push(annotobj);
       setShapeList(updatedAnnotations);
-      send(currentShape);
+      send(annotobj);
       setHasNewShapes(true);
       setCurrentShape([]);
     }
@@ -182,10 +197,13 @@ const LayerTest = ({drawing, color, label, pos, send, request}) => {
     if (isDrawing) {
       setIsDrawing(false);
       console.log("Finished current shape!", currentShape);
+      // before pushing anything to the list of annotation, we
+      // have to format the annotation
+      const annotobj = pointsToAnnotationObj(currentShape);
       const updatedAnnotations = shapeList.slice();
-      updatedAnnotations.push(currentShape);
+      updatedAnnotations.push(annotobj);
       setShapeList(updatedAnnotations);
-      send(currentShape);
+      send(annotobj);
       setHasNewShapes(true);
       setCurrentShape([]);
     }

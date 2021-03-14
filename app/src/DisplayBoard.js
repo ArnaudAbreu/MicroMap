@@ -12,12 +12,12 @@ const DisplayBoard = ({classList, onSwitch}) => {
   const createSwitch = (elem) => {
     return (withStyles({
       switchBase: {
-        color: elem.color[300],
+        color: elem.color,
         '&$checked': {
-          color: elem.color[500],
+          color: elem.color,
         },
         '&$checked + $track': {
-          backgroundColor: elem.color[500],
+          backgroundColor: elem.color,
         },
       },
       checked: {},

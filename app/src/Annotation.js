@@ -18,7 +18,7 @@ const Annotation = ({points, color}) => {
       points={polygonPoints}
       stroke="black"
       strokeWidth="3px"
-      fill={color[500]}
+      fill={color}
       fillOpacity="0.3" />
 
   );
