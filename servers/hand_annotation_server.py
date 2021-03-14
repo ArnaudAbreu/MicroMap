@@ -153,14 +153,6 @@ class Layer(Resource):
             set_annotation_to_slide_id(ROOT, slide_id, annot)
             return annot["layers"][layer_id]
 
-    # def post(self, slide_id, layer_id):
-    #     """Answer POST requests."""
-    #     annot = get_annotation_from_slide_id(ROOT, slide_id)
-    #     if layer_id not in annot["layers"]:
-    #         annot["layers"][layer_id] = dict()
-    #         return annot["layers"][layer_id], 201
-    #     raise ExistingLayerError("Layer {} already exists: {}".format(layer_id, list(annot["layers"].keys())))
-
 
 class Annotation(Resource):
     """A class to handle Annotation requests."""
