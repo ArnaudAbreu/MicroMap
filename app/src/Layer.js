@@ -131,8 +131,17 @@ const LayerTest = ({drawing, color, label, pos, send, request}) => {
       status: "written"
     }
     const updatedShape = currentShape.slice();
-    updatedShape.push(svgPosition);
-    setCurrentShape(updatedShape);
+    if (updatedShape.length > 0) {
+      if (updatedShape[updatedShape.length - 1].status === "flying") {
+        updatedShape.pop();
+      }
+      updatedShape.push(svgPosition);
+      setCurrentShape(updatedShape);
+    }
+    else {
+      updatedShape.push(svgPosition);
+      setCurrentShape(updatedShape);
+    }
   }
 
   const replaceLastPoint = (evt) => {
