@@ -1,7 +1,7 @@
 import React from "react";
 import { LayerTest } from './Layer';
 
-const Overlay = ({hasposition, isVisible, isDrawing, layers, layergetter, annotSetter}) => {
+const Overlay = ({hasposition, isVisible, isDrawing, layers, layergetter, annotSetter, annotRemover}) => {
 
   const switchDrawingMode = (isDrawingEnabled) => {
     if (isDrawingEnabled) {
@@ -36,10 +36,15 @@ const Overlay = ({hasposition, isVisible, isDrawing, layers, layergetter, annotS
   const draw = (elements) => {
     const listItems = elements.map((layer, idx) => {
         const sendLayer = (shapes) => {
+          console.log("sender: ", layer.label);
           return annotSetter(layer.label, shapes);
         }
         const getlayer = () => {
           return layergetter(layer.label);
+        }
+        const remover = (shape) => {
+          console.log("remover: ", shape);
+          return annotRemover(layer.label, shape);
         }
         if (layer.visibility && isVisible) {
           if (layer.editing) {
@@ -52,6 +57,7 @@ const Overlay = ({hasposition, isVisible, isDrawing, layers, layergetter, annotS
                 key={idx}
                 send={sendLayer}
                 request={getlayer}
+                remove={remover}
               />);
           } else {
             return(
@@ -63,6 +69,7 @@ const Overlay = ({hasposition, isVisible, isDrawing, layers, layergetter, annotS
                 key={idx}
                 send={sendLayer}
                 request={getlayer}
+                remove={remover}
               />);
           }
         } else {

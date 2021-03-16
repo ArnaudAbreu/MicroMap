@@ -2,7 +2,15 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import { AnnotViewer } from './AnnotViewer';
 import { WSIAPI, getSlide, getSlides } from "./WSI";
-import { AnnotationAPI, getLayer, getLayers, createLayerGetter, createSlideSetter, setLayer } from "./ANNOT";
+import {
+  AnnotationAPI,
+  getLayer,
+  getLayers,
+  createLayerGetter,
+  createSlideSetter,
+  setLayer,
+  createSlideRemover
+} from "./ANNOT";
 
 
 function App() {
@@ -47,10 +55,10 @@ function App() {
   }
 
   useEffect(() => {
-    console.log("Debug App: ");
-    console.log("-----------");
-    console.log("Annotation layers: ", annotLayers);
-    console.log("-----------\n\n");
+    // console.log("Debug App: ");
+    // console.log("-----------");
+    // console.log("Annotation layers: ", annotLayers);
+    // console.log("-----------\n\n");
   });
 
   const layerGetter = (name) => {
@@ -72,6 +80,7 @@ function App() {
                      resetSlide={selectSrvImageByName}
                      layergetter={layerGetter(slideName)}
                      annotSetter={createSlideSetter(slideName)}
+                     annotRemover={createSlideRemover(slideName)}
                      />
       </div>
     </div>

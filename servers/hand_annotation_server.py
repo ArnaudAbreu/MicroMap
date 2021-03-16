@@ -153,14 +153,6 @@ class Layer(Resource):
             set_annotation_to_slide_id(ROOT, slide_id, annot)
             return annot["layers"][layer_id]
 
-    # def post(self, slide_id, layer_id):
-    #     """Answer POST requests."""
-    #     annot = get_annotation_from_slide_id(ROOT, slide_id)
-    #     if layer_id not in annot["layers"]:
-    #         annot["layers"][layer_id] = dict()
-    #         return annot["layers"][layer_id], 201
-    #     raise ExistingLayerError("Layer {} already exists: {}".format(layer_id, list(annot["layers"].keys())))
-
 
 class Annotation(Resource):
     """A class to handle Annotation requests."""
@@ -176,10 +168,35 @@ class Annotation(Resource):
         print("adding to layer : ", layer_id)
         print("annotation index : ", new_idx)
         print("annotation type : ", type(args["annotation"]))
-        annot["layers"][layer_id][new_idx] = ast.literal_eval(args["annotation"])
-        # print("first annotation in this layer : ", annot["layers"][layer_id]["0"])
+        annot_sent = ast.literal_eval(args["annotation"])
+        annot["layers"][layer_id][new_idx] = annot_sent
+        print("annotation sent has id: ", annot_sent.id)
         set_annotation_to_slide_id(ROOT, slide_id, annot)
         return annot["layers"][layer_id][new_idx], 201
+
+    def delete(self, slide_id, layer_id):
+        """Answer DELETE requests."""
+        args = parser.parse_args()
+        print(args)
+        to_delete = ast.literal_eval(args["annotation"])
+        to_delete_id = to_delete["id"]
+        annot = get_annotation_from_slide_id(ROOT, slide_id)
+        was_deleted = False
+        new_layer = dict()
+        for idx, polygon in annot["layers"][layer_id].items():
+            if polygon["id"] != to_delete_id:
+                new_layer[idx] = polygon
+            else:
+                was_deleted = True
+        if was_deleted:
+            print("Annotation: {} has been deleted!".format(to_delete))
+            annot["layers"][layer_id] = new_layer
+            set_annotation_to_slide_id(ROOT, slide_id, annot)
+        else:
+            print("Could not find annotation id: {} in following annotations:".format(to_delete_id))
+            for idx, polygon in annot["layers"][layer_id].items():
+                print("- ID: {}".format(polygon["id"]))
+        return '', 204
 
 
 # Actually setup the Api resource routing here

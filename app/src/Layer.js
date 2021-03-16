@@ -3,7 +3,27 @@ import React, {
   useState
 } from "react";
 import { Annotation } from './Annotation';
-import { AnnotationAPI, getLayer } from './ANNOT';
+
+
+const gdate = () => {
+  const today = new Date();
+  const dd = String(today.getDate()).padStart(2, '0');
+  const mm = String(today.getMonth() + 1).padStart(2, '0'); //January is 0!
+  const yyyy = today.getFullYear();
+
+  return dd + '/' + mm + '/' + yyyy;
+}
+
+
+const guid = () => {
+    const s4 = () => {
+        return Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1);
+    }
+    //return id of format 'aaaaaaaa'-'aaaa'-'aaaa'-'aaaa'-'aaaaaaaaaaaa'
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+}
 
 
 const rel2abs = (poly, dims) => {
@@ -27,7 +47,7 @@ const annotationsToShapeList = (annotObjects) => {
       return [];
     }
     else if (annot.hasOwnProperty('points')){
-      return annot.points;
+      return annot;
     } else {
       return [];
     }
@@ -35,7 +55,7 @@ const annotationsToShapeList = (annotObjects) => {
   return listOfShapes;
 }
 
-const LayerTest = ({drawing, color, label, pos, send, request}) => {
+const LayerTest = ({drawing, color, label, pos, send, request, remove}) => {
 
   const [isDrawing, setIsDrawing] = useState(false);
   const [shapeList, setShapeList] = useState([]);
@@ -50,6 +70,50 @@ const LayerTest = ({drawing, color, label, pos, send, request}) => {
     setShapeList(annotationsToShapeList(srv_annot));
   }
 
+  const removeAnnot = (annot) => {
+    const annotations = shapeList.filter(item => item.id !== annot.id);
+    setShapeList(annotations);
+    remove(annot);
+  }
+
+  const pointsToAnnotationObj = (points) => {
+    const new_idx = guid();
+    const date = gdate();
+    return {
+      points: points,
+      id: new_idx,
+      author: "arnaud",
+      text: "",
+      label: label,
+      color: color,
+      date: date
+    };
+  }
+
+  const pointsToFlyingAnnotationComponent = (points) => {
+    return {
+      points: rel2abs(points, pos),
+      id: "",
+      author: "arnaud",
+      text: "",
+      label: label,
+      color: color,
+      date: ""
+    };
+  }
+
+  const annotToAnnotationComponent = (annot) => {
+    return {
+      points: rel2abs(annot.points, pos),
+      id: annot.id,
+      author: annot.author,
+      text: annot.text,
+      label: annot.label,
+      color: annot.color,
+      date: annot.date
+    };
+  }
+
   useEffect(() => {
     if (hasNewShapes === false){
       getShapeList();
@@ -57,12 +121,13 @@ const LayerTest = ({drawing, color, label, pos, send, request}) => {
   }, []);
 
   const annotationList = (elements, flying) => {
-    const listItems = elements.map((coords, idx) => {
+    const listItems = elements.map((annot, idx) => {
         return(
           <Annotation
-            points={rel2abs(coords, pos)}
-            color={color}
-            key={idx}
+            shape={annotToAnnotationComponent(annot)}
+            status="written"
+            remove={removeAnnot}
+            key={annot.id}
           />
         );
       }
@@ -70,31 +135,9 @@ const LayerTest = ({drawing, color, label, pos, send, request}) => {
     if (flying.length > 0){
       listItems.push(
         <Annotation
-          points={rel2abs(flying, pos)}
-          color={color}
-          key={elements.length}
-        />
-      );
-    }
-    return listItems;
-  }
-
-  const objAnnotationList = (elements, flying) => {
-    const listItems = Object.entries(elements).map((coords, idx) => {
-        return(
-          <Annotation
-            points={rel2abs(coords, pos)}
-            color={color}
-            key={idx}
-          />
-        );
-      }
-    );
-    if (flying.length > 0){
-      listItems.push(
-        <Annotation
-          points={rel2abs(flying, pos)}
-          color={color}
+          shape={pointsToFlyingAnnotationComponent(flying)}
+          status="flying"
+          remove={removeAnnot}
           key={elements.length}
         />
       );
@@ -119,8 +162,17 @@ const LayerTest = ({drawing, color, label, pos, send, request}) => {
       status: "written"
     }
     const updatedShape = currentShape.slice();
-    updatedShape.push(svgPosition);
-    setCurrentShape(updatedShape);
+    if (updatedShape.length > 0) {
+      if (updatedShape[updatedShape.length - 1].status === "flying") {
+        updatedShape.pop();
+      }
+      updatedShape.push(svgPosition);
+      setCurrentShape(updatedShape);
+    }
+    else {
+      updatedShape.push(svgPosition);
+      setCurrentShape(updatedShape);
+    }
   }
 
   const replaceLastPoint = (evt) => {
@@ -168,10 +220,13 @@ const LayerTest = ({drawing, color, label, pos, send, request}) => {
     if (isDrawing && evt.key === 'Enter') {
       setIsDrawing(false);
       console.log("Finished current shape!", currentShape);
+      // before pushing anything to the list of annotation, we
+      // have to format the annotation
+      const annotobj = pointsToAnnotationObj(currentShape);
       const updatedAnnotations = shapeList.slice();
-      updatedAnnotations.push(currentShape);
+      updatedAnnotations.push(annotobj);
       setShapeList(updatedAnnotations);
-      send(currentShape);
+      send(annotobj);
       setHasNewShapes(true);
       setCurrentShape([]);
     }
@@ -179,13 +234,16 @@ const LayerTest = ({drawing, color, label, pos, send, request}) => {
 
   const handleContextMenu = (evt) => {
     evt.preventDefault();
-    if (isDrawing) {
+    if (isDrawing && (currentShape.length > 0)) {
       setIsDrawing(false);
       console.log("Finished current shape!", currentShape);
+      // before pushing anything to the list of annotation, we
+      // have to format the annotation
+      const annotobj = pointsToAnnotationObj(currentShape);
       const updatedAnnotations = shapeList.slice();
-      updatedAnnotations.push(currentShape);
+      updatedAnnotations.push(annotobj);
       setShapeList(updatedAnnotations);
-      send(currentShape);
+      send(annotobj);
       setHasNewShapes(true);
       setCurrentShape([]);
     }

@@ -23,18 +23,24 @@ import {
   blueGrey
 } from '@material-ui/core/colors';
 
+// const colorCycle = [
+//   red, lightGreen, yellow, deepPurple, pink, lime, purple, amber,
+//   indigo, orange, blue, deepOrange, lightBlue, brown, cyan,
+//   blueGrey, teal, green
+// ];
+
 const colorCycle = [
-  red, lightGreen, yellow, deepPurple, pink, lime, purple, amber,
-  indigo, orange, blue, deepOrange, lightBlue, brown, cyan,
-  blueGrey, teal, green
-];
+  "#f44336", "#8bc34a", "#ffeb3b", "#673ab7", "#e91e63", "#cddc39", "#9c27b0", "#ffc107",
+  "#3f51b5", "#ff9800", "#2196f3", "#ff5722", "#03a9f4", "#795548", "#00bcd4",
+  "#607d8b", "#009688", "#4caf50"
+]
 
 const addNoneAnnotation = (annotations) => {
   const ann = annotations.slice();
   ann.push({index: ann.length,
                label: "None",
                visibility: false,
-               color: grey,
+               color: "#9e9e9e",
                disabled: false,
                editing: false});
   return ann;
@@ -76,7 +82,8 @@ const AnnotViewer = ({img, x, y,
                       annots,
                       resetSlide,
                       layergetter,
-                      annotSetter}) => {
+                      annotSetter,
+                      annotRemover}) => {
 
   const [layerList, setLayerList] = useState([]);
   const [isInit, setIsInit] = useState(false);
@@ -277,6 +284,7 @@ const AnnotViewer = ({img, x, y,
         layers={layerList}
         layergetter={layergetter}
         annotSetter={annotSetter}
+        annotRemover={annotRemover}
       />
     </div>
   );

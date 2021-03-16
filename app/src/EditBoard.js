@@ -12,9 +12,9 @@ const EditBoard = ({classList, onRadioChange}) => {
   const createRadio = (elem) => {
     return (withStyles({
         root: {
-          color: elem.color[400],
+          color: elem.color,
           '&$checked': {
-            color: elem.color[600],
+            color: elem.color,
           },
         },
         checked: {},
