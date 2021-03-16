@@ -47,6 +47,19 @@ const createLayerSetter = (setter, layername) => {
   return ((shape) => {setter(layername, shape)})
 }
 
+const removeFromLayer = (slidename, layername, shape) => {
+  const annotation = {annotation: shape};
+  return AnnotationAPI.delete("/annotation/" + slidename + "/" + layername, {data: annotation});
+}
+
+const createSlideRemover = (slidename) => {
+  return ((layername, shape) => {removeFromLayer(slidename, layername, shape)});
+}
+
+const createLayerRemover = (remover, layername) => {
+  return ((shape) => {remover(layername, shape)})
+}
+
 
 export {
   AnnotationAPI,
@@ -57,5 +70,8 @@ export {
   createShapeGetter,
   setLayer,
   createSlideSetter,
-  createLayerSetter
+  createLayerSetter,
+  removeFromLayer,
+  createSlideRemover,
+  createLayerRemover
 };

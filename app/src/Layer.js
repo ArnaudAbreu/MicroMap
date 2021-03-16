@@ -3,7 +3,6 @@ import React, {
   useState
 } from "react";
 import { Annotation } from './Annotation';
-import { AnnotationAPI, getLayer } from './ANNOT';
 
 
 const gdate = () => {
@@ -56,7 +55,7 @@ const annotationsToShapeList = (annotObjects) => {
   return listOfShapes;
 }
 
-const LayerTest = ({drawing, color, label, pos, send, request}) => {
+const LayerTest = ({drawing, color, label, pos, send, request, remove}) => {
 
   const [isDrawing, setIsDrawing] = useState(false);
   const [shapeList, setShapeList] = useState([]);
@@ -69,6 +68,12 @@ const LayerTest = ({drawing, color, label, pos, send, request}) => {
     const response = await request();
     let srv_annot = await response.data;
     setShapeList(annotationsToShapeList(srv_annot));
+  }
+
+  const removeAnnot = (annot) => {
+    const annotations = shapeList.filter(item => item.id !== annot.id);
+    setShapeList(annotations);
+    remove(annot);
   }
 
   const pointsToAnnotationObj = (points) => {
@@ -85,6 +90,30 @@ const LayerTest = ({drawing, color, label, pos, send, request}) => {
     };
   }
 
+  const pointsToFlyingAnnotationComponent = (points) => {
+    return {
+      points: rel2abs(points, pos),
+      id: "",
+      author: "arnaud",
+      text: "",
+      label: label,
+      color: color,
+      date: ""
+    };
+  }
+
+  const annotToAnnotationComponent = (annot) => {
+    return {
+      points: rel2abs(annot.points, pos),
+      id: annot.id,
+      author: annot.author,
+      text: annot.text,
+      label: annot.label,
+      color: annot.color,
+      date: annot.date
+    };
+  }
+
   useEffect(() => {
     if (hasNewShapes === false){
       getShapeList();
@@ -95,8 +124,9 @@ const LayerTest = ({drawing, color, label, pos, send, request}) => {
     const listItems = elements.map((annot, idx) => {
         return(
           <Annotation
-            points={rel2abs(annot.points, pos)}
-            color={color}
+            shape={annotToAnnotationComponent(annot)}
+            status="written"
+            remove={removeAnnot}
             key={annot.id}
           />
         );
@@ -105,8 +135,9 @@ const LayerTest = ({drawing, color, label, pos, send, request}) => {
     if (flying.length > 0){
       listItems.push(
         <Annotation
-          points={rel2abs(flying, pos)}
-          color={color}
+          shape={pointsToFlyingAnnotationComponent(flying)}
+          status="flying"
+          remove={removeAnnot}
           key={elements.length}
         />
       );
@@ -203,7 +234,7 @@ const LayerTest = ({drawing, color, label, pos, send, request}) => {
 
   const handleContextMenu = (evt) => {
     evt.preventDefault();
-    if (isDrawing) {
+    if (isDrawing && (currentShape.length > 0)) {
       setIsDrawing(false);
       console.log("Finished current shape!", currentShape);
       // before pushing anything to the list of annotation, we

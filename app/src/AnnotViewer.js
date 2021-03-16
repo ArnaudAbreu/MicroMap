@@ -82,7 +82,8 @@ const AnnotViewer = ({img, x, y,
                       annots,
                       resetSlide,
                       layergetter,
-                      annotSetter}) => {
+                      annotSetter,
+                      annotRemover}) => {
 
   const [layerList, setLayerList] = useState([]);
   const [isInit, setIsInit] = useState(false);
@@ -283,6 +284,7 @@ const AnnotViewer = ({img, x, y,
         layers={layerList}
         layergetter={layergetter}
         annotSetter={annotSetter}
+        annotRemover={annotRemover}
       />
     </div>
   );
