@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const WSI_URL = process.env.REACT_APP_SLIDE_SERVER_URL;
+const WSI_URL = process.env.REACT_APP_FLASK_SERVER_URL;
 
 const WSIAPI = axios.create({
   baseURL: WSI_URL,

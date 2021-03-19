@@ -38,6 +38,7 @@ function App() {
     let srv_slide_info = await response.data;
     const annotresponse = await getLayers(slidename);
     let srv_annot_layers = await annotresponse.data;
+    console.log("annot_layers: ", srv_annot_layers)
     setSelectedSrvImage(srv_slide_info);
     setAnnotLayers(srv_annot_layers);
     setFoundAnnotations(true);

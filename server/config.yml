@@ -1,0 +1,9 @@
+# wsi server configuration file
+# Directory with slides
+root_wsi: /data/DeepLearning/SCHWOB_Robin/PACS_slides/1
+
+root_annots: /data/DeepLearning/SCHWOB_Robin/PACS_slides_annots/1
+# Ip of host
+ip: 127.0.0.1
+# Port of host
+port: 3001

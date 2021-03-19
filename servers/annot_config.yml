@@ -1,7 +1,0 @@
-# wsi server configuration file
-# Directory with the annotations
-root: ****
-# Ip of host
-ip: ****
-# Port of host
-port: ****
