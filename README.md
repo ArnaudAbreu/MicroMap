@@ -6,19 +6,17 @@ This project is about viewing and annotating digital pathology slides. At the mo
 
 ### Backend Slide Server
 
-In `servers/wsi_config.yml`,\
-Set the root directory containing your WSI files.\
+In `servers/config.yml`,\
+Set the wsi_root directory containing your WSI files.\
+Set the annot_root directory where to store annotation files.\
 Set the ip of the slide server (`127.0.0.1` for localhost).\
 Set the port of the slide server.
 
-### Backend Annotation Server
-
-In `servers/annot_config.yml`,\
-Set the root directory where to store annotation files.\
-Set the ip of the slide server (`127.0.0.1` for localhost).\
-Set the port of the slide server.
-
-> :warning: **Setting ports**: Be very careful Slide server and Annotation server must run on different ports!
+Start the server:
+```bash
+cd server
+python server.py
+```
 
 ### Frontend App Server
 
@@ -32,7 +30,7 @@ Second, install `serve` node package with:
 npm install -g serve
 ```
 
-Make sure the `app/.env` urls matches the ip set in the backend servers.\
+Make sure the `app/.env` url matches the ip set in the backend server.\
 `cd` to the `app` folder, and run the following commands:
 ``` bash
 npm install
