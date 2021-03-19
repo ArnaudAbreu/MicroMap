@@ -64,7 +64,6 @@ const OpenSeaDragonViewer = ({image, x, y, overlay, drawing, layers, isNone, lay
                 blendTime: 0.1,
                 constrainDuringPan: true,
                 maxZoomPixelRatio: 2,
-                minZoomLevel: 1,
                 visibilityRatio: 1,
                 zoomPerScroll: 2,
                 timeout: 120000,
