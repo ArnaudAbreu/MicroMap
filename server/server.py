@@ -1,7 +1,6 @@
-import yaml
 import openslide
 import os
-from flask import Flask, make_response
+from flask import Flask, make_response, request
 from flask_restful import reqparse, abort, Api, Resource
 from flask_cors import CORS
 from io import BytesIO
@@ -9,20 +8,7 @@ from wsi import slides_in_folder, slide_info_to_dict
 from hand_annotation import get_annotation_from_slide_id, set_annotation_to_slide_id
 from tqdm import tqdm
 from openslide.deepzoom import DeepZoomGenerator
-import argparse
 import ast
-
-# server argument parser
-script_arg_parser = argparse.ArgumentParser()
-script_arg_parser.add_argument(
-    "--config",
-    type=str,
-    help="yaml configuration file of the server.",
-    default="config.yml",
-)
-script_args = script_arg_parser.parse_args()
-with open(script_args.config, "r") as f:
-    cfg = yaml.load(f, Loader=yaml.FullLoader)
 
 app = Flask(__name__)
 CORS(app)
@@ -35,10 +21,8 @@ DEEPZOOM_TILE_SIZE = 254
 DEEPZOOM_OVERLAP = 1
 DEEPZOOM_LIMIT_BOUNDS = False
 DEEPZOOM_TILE_QUALITY = 75
-ROOT_WSI = cfg["root_wsi"]
-ROOT_ANNOTS = cfg["root_annots"]
-IP = cfg["ip"]
-PORT = cfg["port"]
+ROOT_WSI = "/data/slides"
+ROOT_ANNOTS = "/data/annots"
 SLIDES = dict()
 for s in tqdm(iterable=slides_in_folder(ROOT_WSI), ascii=True):
     try:
@@ -101,8 +85,8 @@ class Slide(Resource):
         abort_if_slide_does_not_exist(slide_ID)
         slide = SLIDES[slide_ID]
         res = slide_info_to_dict(slide)
-        res["source"]["Image"]["Url"] = "http://{}:{}/slides/{}/".format(
-            IP, PORT, slide_ID
+        res["source"]["Image"]["Url"] = "http://{}/slides/{}/".format(
+            request.host, slide_ID
         )
         res["source"]["Image"]["xmlns"] = "http://schemas.microsoft.com/deepzoom/2008"
         return res
@@ -240,4 +224,4 @@ api.add_resource(Annotation, "/annotations/<slide_id>/<layer_id>")
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host=IP, port=PORT)
+    app.run(debug=True)
