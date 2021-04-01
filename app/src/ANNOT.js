@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const ANNOT_URL = process.env.REACT_APP_ANNOT_SERVER_URL;
+const ANNOT_URL = process.env.REACT_APP_FLASK_SERVER_URL;
 
 const AnnotationAPI = axios.create({
   baseURL: ANNOT_URL,
@@ -16,7 +16,7 @@ const createLayersGetter = (slidename) => {
 }
 
 const getLayer = (slidename, layername) => {
-  return AnnotationAPI.get("/layer/" + slidename + "/" + layername);
+  return AnnotationAPI.get("/layers/" + slidename + "/" + layername);
 }
 
 const createLayerGetter = (slidename) => {
@@ -36,7 +36,7 @@ const createShapeGetter = (getter, layername) => {
 
 const setLayer = (slidename, layername, shape) => {
   const annotation = {annotation: shape};
-  return AnnotationAPI.post("/annotation/" + slidename + "/" + layername, annotation);
+  return AnnotationAPI.post("/annotations/" + slidename + "/" + layername, annotation);
 }
 
 const createSlideSetter = (slidename) => {
@@ -49,7 +49,7 @@ const createLayerSetter = (setter, layername) => {
 
 const removeFromLayer = (slidename, layername, shape) => {
   const annotation = {annotation: shape};
-  return AnnotationAPI.delete("/annotation/" + slidename + "/" + layername, {data: annotation});
+  return AnnotationAPI.delete("/annotations/" + slidename + "/" + layername, {data: annotation});
 }
 
 const createSlideRemover = (slidename) => {

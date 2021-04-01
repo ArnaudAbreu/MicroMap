@@ -1,0 +1,6 @@
+openslide-python
+flask
+flask-restful
+flask-cors
+pyyaml
+tqdm
