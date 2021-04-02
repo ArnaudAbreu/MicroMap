@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const WSI_URL = process.env.REACT_APP_FLASK_SERVER_IP + ":" + process.env.REACT_APP_FLASK_SERVER_PORT;
+const WSI_URL = "http://"+process.env.REACT_APP_FLASK_SERVER_IP + ":" + process.env.REACT_APP_FLASK_SERVER_PORT;
 console.log(WSI_URL);
 
 const WSIAPI = axios.create({

@@ -4,38 +4,22 @@ This project is about viewing and annotating digital pathology slides. At the mo
 
 ## Install and run instructions
 
-### Backend Slide Server
+### Edit env file
 
-In `servers/config.yml`,\
-Set the wsi_root directory containing your WSI files.\
-Set the annot_root directory where to store annotation files.\
-Set the ip of the slide server (`127.0.0.1` for localhost).\
-Set the port of the slide server.
+In the `.env` file, change the `SLIDES` and `ANNOTS` variables to point to your slide and annotation folders.
+Change the `REACT_APP_PORT` and `REACT_APP_FLASK_SERVER_PORT` to available ports (they need to be different).
 
-Start the server:
-```bash
-cd server
-python server.py
-```
+**Untested**: Change the `REACT_APP_FLASK_SERVER_IP` to the ip the server is running on.
+Anything else than `0.0.0.0` (local access) is untested and may not work as intended.
+If the server is running remotely, putting the ip address of the remote server should work.
 
-### Frontend App Server
+### Run the dockers
 
-First, make sure you have node installed (here is the command for a system with yum package manager):
-```bash
-yum install nodejs
-```
+Make sure you have [docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/) installed. 
 
-Second, install `serve` node package with:
-```bash
-npm install -g serve
-```
+From the main directory (`MicroMap`), run `docker-compose up`. The app and server should build and start.
 
-Make sure the `app/.env` url matches the ip set in the backend server.\
-`cd` to the `app` folder, and run the following commands:
-``` bash
-npm install
-npm run build
-serve -s build -l {port}
-```
 
-> :warning: **Setting port**: Ensure port is different from ports you set previously...
+### Connect to the app
+
+On your web browser, connect to `http://APP_IP:REACT_APP_PORT/` where `APP_IP` is the ip of the machine app is running on. `REACT_APP_PORT` is the same as defined in the `.env` file.
