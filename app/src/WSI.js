@@ -1,12 +1,13 @@
 import axios from "axios";
 
-const WSI_URL = process.env.REACT_APP_FLASK_SERVER_URL;
+const WSI_URL = process.env.REACT_APP_FLASK_SERVER_IP + ":" + process.env.REACT_APP_FLASK_SERVER_PORT;
+console.log(WSI_URL);
 
 const WSIAPI = axios.create({
   baseURL: WSI_URL,
   responseType: "json",
   headers: {
-    'Access-Control-Allow-Origin' : '*',
+    'Access-Control-Allow-Origin': '*',
   }
 });
 
