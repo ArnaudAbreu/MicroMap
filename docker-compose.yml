@@ -13,7 +13,7 @@ services:
       - FLASK_APP=server.py
       - LD_LIBRARY_PATH=/usr/local/lib
     ports:
-      - "${SERVER_PORT}:5000"
+      - "${REACT_APP_FLASK_SERVER_PORT}:5000"
 
   app:
     build: app
@@ -22,7 +22,7 @@ services:
       - ./app:/app
       - node-modules:/app/node_modules
     ports:
-      - "${APP_PORT}:3000"
+      - "${REACT_APP_PORT}:3000"
     depends_on:
       - server
 
