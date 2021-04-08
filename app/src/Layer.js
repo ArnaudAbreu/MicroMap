@@ -41,12 +41,13 @@ const rel2abs = (poly, dims) => {
 
 const annotationsToShapeList = (annotObjects) => {
   const listOfShapes = Object.entries(annotObjects).map((data, idx) => {
-    console.log(data[1]);
     const annot = data[1];
+    // console.log("data from request: ", annot);
     if (annot === null){
       return [];
     }
     else if (annot.hasOwnProperty('points')){
+      // console.log("had property points !!!");
       return annot;
     } else {
       return [];
@@ -67,7 +68,8 @@ const LayerTest = ({drawing, color, label, pos, send, request, remove}) => {
   const getShapeList = async () => {
     const response = await request();
     let srv_annot = await response.data;
-    setShapeList(annotationsToShapeList(srv_annot));
+    // console.log("requested annotations: ", srv_annot);
+    setShapeList(annotationsToShapeList(srv_annot.shapes));
   }
 
   const removeAnnot = (annot) => {
@@ -103,6 +105,7 @@ const LayerTest = ({drawing, color, label, pos, send, request, remove}) => {
   }
 
   const annotToAnnotationComponent = (annot) => {
+    // console.log("annot2component: ", annot);
     return {
       points: rel2abs(annot.points, pos),
       id: annot.id,

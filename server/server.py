@@ -14,6 +14,12 @@ app = Flask(__name__)
 CORS(app)
 api = Api(app)
 
+colorCycle = [
+    "#f44336", "#8bc34a", "#ffeb3b", "#673ab7", "#e91e63", "#cddc39", "#9c27b0",
+    "#ffc107", "#3f51b5", "#ff9800", "#2196f3", "#ff5722", "#03a9f4", "#795548",
+    "#00bcd4", "#607d8b", "#009688", "#4caf50"
+]
+
 SLIDE_DIR = "."
 SLIDE_CACHE_SIZE = 10
 DEEPZOOM_FORMAT = "jpeg"
@@ -144,7 +150,7 @@ class LayerList(Resource):
     def get(self, slide_id):
         """Answer GET requests."""
         annot = get_annotation_from_slide_id(ROOT_ANNOTS, slide_id)
-        return list(annot["layers"].keys())
+        return [{"id": ann["id"], "color": ann["color"]} for ann in annot["layers"]]
 
 
 parser = reqparse.RequestParser()
@@ -157,12 +163,17 @@ class Layer(Resource):
     def get(self, slide_id, layer_id):
         """Answer GET requests."""
         annot = get_annotation_from_slide_id(ROOT_ANNOTS, slide_id)
-        if layer_id in annot["layers"]:
-            return annot["layers"][layer_id]
-        else:
-            annot["layers"][layer_id] = dict()
-            set_annotation_to_slide_id(ROOT_ANNOTS, slide_id, annot)
-            return annot["layers"][layer_id]
+        for layer in annot["layers"]:
+            if layer_id == layer["id"]:
+                return layer
+        new_layer = {
+            "id": layer_id,
+            "color": colorCycle[int((len(annot["layers"]) + 1) % len(colorCycle))],
+            "shapes": []
+        }
+        annot["layers"].append(new_layer)
+        set_annotation_to_slide_id(ROOT_ANNOTS, slide_id, annot)
+        return new_layer
 
 
 class Annotation(Resource):
@@ -172,18 +183,19 @@ class Annotation(Resource):
         """Answer POST requests."""
         args = parser.parse_args()
         annot = get_annotation_from_slide_id(ROOT_ANNOTS, slide_id)
+
         print(args["annotation"])
-        new_idx = 0
-        if len(annot["layers"][layer_id]) > 0:
-            new_idx = max([int(idx) for idx in annot["layers"][layer_id].keys()]) + 1
-        print("adding to layer : ", layer_id)
-        print("annotation index : ", new_idx)
-        print("annotation type : ", type(args["annotation"]))
+
         annot_sent = ast.literal_eval(args["annotation"])
-        annot["layers"][layer_id][new_idx] = annot_sent
-        print("annotation sent has id: ", annot_sent.id)
-        set_annotation_to_slide_id(ROOT_ANNOTS, slide_id, annot)
-        return annot["layers"][layer_id][new_idx], 201
+
+        for layer in annot["layers"]:
+            if layer_id == layer["id"]:
+                layer["shapes"].append(annot_sent)
+
+                # print("annotation sent has id: ", annot_sent.id)
+
+                set_annotation_to_slide_id(ROOT_ANNOTS, slide_id, annot)
+                return annot_sent, 201
 
     def delete(self, slide_id, layer_id):
         """Answer DELETE requests."""
@@ -194,14 +206,20 @@ class Annotation(Resource):
         annot = get_annotation_from_slide_id(ROOT_ANNOTS, slide_id)
         was_deleted = False
         new_layer = dict()
-        for idx, polygon in annot["layers"][layer_id].items():
-            if polygon["id"] != to_delete_id:
-                new_layer[idx] = polygon
-            else:
-                was_deleted = True
+        layer_idx = 0
+        for layer in annot["layers"]:
+            if layer_id == layer["id"]:
+                new_layer["id"] = layer_id
+                new_layer["color"] = layer["color"]
+                new_layer["shapes"] = []
+                for shape in layer["shapes"]:
+                    if shape["id"] != to_delete_id:
+                        new_layer["shapes"].append(shape)
+                    else:
+                        print("Annotation: {} has been deleted!".format(to_delete))
+            layer_idx += 1
         if was_deleted:
-            print("Annotation: {} has been deleted!".format(to_delete))
-            annot["layers"][layer_id] = new_layer
+            annot["layers"][layer_idx] = new_layer
             set_annotation_to_slide_id(ROOT_ANNOTS, slide_id, annot)
         else:
             print(
@@ -209,8 +227,6 @@ class Annotation(Resource):
                     to_delete_id
                 )
             )
-            for idx, polygon in annot["layers"][layer_id].items():
-                print("- ID: {}".format(polygon["id"]))
         return "", 204
 
 

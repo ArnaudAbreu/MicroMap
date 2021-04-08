@@ -38,7 +38,7 @@ function App() {
     let srv_slide_info = await response.data;
     const annotresponse = await getLayers(slidename);
     let srv_annot_layers = await annotresponse.data;
-    console.log("annot_layers: ", srv_annot_layers)
+    // console.log("annot_layers: ", srv_annot_layers)
     setSelectedSrvImage(srv_slide_info);
     setAnnotLayers(srv_annot_layers);
     setFoundAnnotations(true);
@@ -56,10 +56,10 @@ function App() {
   }
 
   useEffect(() => {
-    // console.log("Debug App: ");
-    // console.log("-----------");
-    // console.log("Annotation layers: ", annotLayers);
-    // console.log("-----------\n\n");
+    console.log("Debug App: ");
+    console.log("-----------");
+    console.log("Annotation layers: ", annotLayers);
+    console.log("-----------\n\n");
   });
 
   const layerGetter = (name) => {
