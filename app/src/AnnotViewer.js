@@ -1,39 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { OpenSeaDragonViewer } from './OpenSeaDragonViewer';
 import { ToolBelt } from './ToolBelt';
-import {
-  red,
-  pink,
-  purple,
-  deepPurple,
-  indigo,
-  blue,
-  lightBlue,
-  cyan,
-  teal,
-  green, // middle
-  lightGreen,
-  lime,
-  yellow,
-  amber,
-  orange,
-  deepOrange,
-  brown,
-  grey,
-  blueGrey
-} from '@material-ui/core/colors';
-
-// const colorCycle = [
-//   red, lightGreen, yellow, deepPurple, pink, lime, purple, amber,
-//   indigo, orange, blue, deepOrange, lightBlue, brown, cyan,
-//   blueGrey, teal, green
-// ];
-
-const colorCycle = [
-  "#f44336", "#8bc34a", "#ffeb3b", "#673ab7", "#e91e63", "#cddc39", "#9c27b0", "#ffc107",
-  "#3f51b5", "#ff9800", "#2196f3", "#ff5722", "#03a9f4", "#795548", "#00bcd4",
-  "#607d8b", "#009688", "#4caf50"
-]
 
 const addNoneAnnotation = (annotations) => {
   const ann = annotations.slice();
@@ -47,13 +14,13 @@ const addNoneAnnotation = (annotations) => {
 }
 
 const initAnnotations = (ann) => {
+  console.log("init annotation with: ", ann);
   const annotations = ann.map((category, idx) => {
-    const col = colorCycle[idx]
     const annotState = {
-      index: idx,
-      label: category,
+      index: category.id,
+      label: category.id,
       visibility: false,
-      color: col,
+      color: category.color,
       disabled: false,
       editing: false
     };
@@ -61,19 +28,6 @@ const initAnnotations = (ann) => {
   })
   return addNoneAnnotation(annotations);
 
-}
-
-const addLayerAnnotation = (ann, name) => {
-  const annotations = ann.slice();
-  const noneAnnot = annotations.pop();
-  annotations.push({index: ann.length,
-                    label: name,
-                    visibility: false,
-                    color: colorCycle[ann.length-1],
-                    disabled: false,
-                    editing: false});
-  annotations.push(noneAnnot);
-  return annotations;
 }
 
 const AnnotViewer = ({img, x, y,
@@ -90,6 +44,25 @@ const AnnotViewer = ({img, x, y,
   const [displayNone, setDisplayNone] = useState(false);
   const [editNone, setEditNone] = useState(true);
   const [provided, setProvided] = useState(annots);
+
+  const addNewLayer = async (ann, name) => {
+    const annotations = ann.slice();
+    const noneAnnot = annotations.pop();
+
+    const response = await layergetter(name);
+    let srv_layer = await response.data;
+    console.log("requested layer: ", srv_layer);
+    // setShapeList(annotationsToShapeList(srv_annot.shapes));
+
+    annotations.push({index: srv_layer.id,
+                      label: name,
+                      visibility: false,
+                      color: srv_layer.color,
+                      disabled: false,
+                      editing: false});
+    annotations.push(noneAnnot);
+    setLayerList(annotations);
+  }
 
   const changeAnnotVisibleToNone = () => {
     const annotations = layerList.map((annot, idx) => {
@@ -239,8 +212,7 @@ const AnnotViewer = ({img, x, y,
 
   const addLayer = (name) => {
     console.log("adding layer: ", name);
-    const annots = addLayerAnnotation(layerList, name);
-    setLayerList(annots);
+    addNewLayer(layerList, name);
   }
 
   useEffect(() => {
@@ -250,13 +222,13 @@ const AnnotViewer = ({img, x, y,
       setLayerList(initAnnotations(annots));
       setIsInit(true);
     }
-    console.log("Debug AnnotViewer: ");
-    console.log("-----------");
-    console.log("Provided annotations: ", annots);
-    console.log("Found annotations: ", foundAnnots);
-    console.log("Annotation state: ", layerList);
-    console.log("re-render AnnotViewer");
-    console.log("-----------\n\n");
+    // console.log("Debug AnnotViewer: ");
+    // console.log("-----------");
+    // console.log("Provided annotations: ", annots);
+    // console.log("Found annotations: ", foundAnnots);
+    // console.log("Annotation state: ", layerList);
+    // console.log("re-render AnnotViewer");
+    // console.log("-----------\n\n");
   });
 
   const reInit = () => {
