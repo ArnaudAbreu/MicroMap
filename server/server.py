@@ -244,6 +244,7 @@ class SlideTree(Resource):
             res.append(
                 {
                     "type": "file",
+                    "name": os.path.basename(slide),
                     "path": os.path.relpath(slide, ROOT_WSI),
                     "annotated": os.path.exists(annot)
                 }

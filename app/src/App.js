@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import { AnnotViewer } from './AnnotViewer';
 import { WSIAPI, getSlide, getSlides } from "./WSI";
+import { FileNav } from './Tree';
 import {
   AnnotationAPI,
   getLayer,
@@ -83,6 +84,9 @@ function App() {
                      annotSetter={createSlideSetter(slideName)}
                      annotRemover={createSlideRemover(slideName)}
                      />
+      </div>
+      <div>
+        <FileNav />
       </div>
     </div>
   );
