@@ -5,8 +5,8 @@ import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
-import { TreeView } from '@material-ui/lab';
-import { TreeItem } from '@material-ui/lab';
+import TreeItem from '@material-ui/lab/TreeItem';
+import TreeView from '@material-ui/lab/TreeView';
 import Typography from '@material-ui/core/Typography';
 
 const useTreeItemStyles = makeStyles((theme) => ({
