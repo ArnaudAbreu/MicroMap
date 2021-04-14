@@ -24,7 +24,7 @@ const useTreeItemStyles = makeStyles((theme) => ({
     },
   },
   content: {
-    color: theme.palette.text.secondary,
+    color: 'white',
     borderTopRightRadius: theme.spacing(2),
     borderBottomRightRadius: theme.spacing(2),
     paddingRight: theme.spacing(1),
@@ -56,6 +56,7 @@ const useTreeItemStyles = makeStyles((theme) => ({
   labelText: {
     fontWeight: 'inherit',
     flexGrow: 1,
+    color: 'white'
   },
 }));
 

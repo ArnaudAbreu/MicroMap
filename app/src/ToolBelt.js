@@ -19,6 +19,7 @@ import { DisplayBoard } from './DisplayBoard';
 import { EditBoard } from './EditBoard';
 import { SlideSelector } from './SlideSelector';
 import { BasicTextFields } from './AddLayer'
+import { FileNav } from './Tree';
 
 const drawerWidth = 240;
 
@@ -90,6 +91,7 @@ const ToolBelt = ({classList, displayOnSwitch, editOnRadioChange, slides, resetS
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -98,6 +100,14 @@ const ToolBelt = ({classList, displayOnSwitch, editOnRadioChange, slides, resetS
   const handleDrawerClose = () => {
     setOpen(false);
   };
+
+  const handleNavDrawerOpen = () => {
+    setNavOpen(true);
+  }
+
+  const handleNavDrawerClose = () => {
+    setNavOpen(false);
+  }
 
   useEffect(() => {
     // console.log("Debug ToolBelt: ");
@@ -128,6 +138,15 @@ const ToolBelt = ({classList, displayOnSwitch, editOnRadioChange, slides, resetS
           <SlideSelector slides={slides}
                          resetImage={resetSlide}
                          resetInit={resetInit}/>
+         <IconButton
+           color="inherit"
+           aria-label="open drawer right"
+           onClick={handleNavDrawerOpen}
+           edge="start"
+           className={clsx(classes.menuButton, open && classes.hide)}
+         >
+           <ChevronLeftIcon />
+         </IconButton>
         </Toolbar>
       </AppBar>
 
@@ -142,7 +161,7 @@ const ToolBelt = ({classList, displayOnSwitch, editOnRadioChange, slides, resetS
       >
         <div className={classes.drawerHeader}>
           <Typography gutterBottom variant="h4">
-              Tool Belt
+              Tools
           </Typography>
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === 'ltr' ? <ChevronLeftIcon style={{fill: "white"}}/> : <ChevronRightIcon style={{fill: "white"}}/>}
@@ -185,6 +204,49 @@ const ToolBelt = ({classList, displayOnSwitch, editOnRadioChange, slides, resetS
         <EditBoard classList={classList} onRadioChange={editOnRadioChange} />
 
         <BasicTextFields addLayer={addLayer}/>
+
+      </Drawer>
+
+
+      <Drawer
+        className={classes.drawer}
+        variant="persistent"
+        anchor="right"
+        open={navOpen}
+        classes={{
+          paper: classes.drawerPaper,
+        }}
+      >
+        <div className={classes.drawerHeader}>
+          <IconButton onClick={handleNavDrawerClose}>
+            {theme.direction === 'ltr' ? <ChevronRightIcon style={{fill: "white"}}/> : <ChevronLeftIcon style={{fill: "white"}}/>}
+          </IconButton>
+          <Typography gutterBottom variant="h4">
+              Navigation
+          </Typography>
+        </div>
+
+        <Divider
+          classes={{
+            root: classes.divider,
+          }} />
+
+
+        <div style={{marginTop: "35px"}}>
+          <Typography gutterBottom variant="h6">
+              Server Root
+          </Typography>
+        </div>
+
+        <Divider
+          variant="middle"
+          classes={{
+            root: classes.divider,
+          }} />
+
+        <div style={{marginTop: "35px", marginLeft: "25px"}}>
+          <FileNav />
+        </div>
 
       </Drawer>
 

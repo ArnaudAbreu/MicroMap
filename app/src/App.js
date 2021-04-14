@@ -85,9 +85,6 @@ function App() {
                      annotRemover={createSlideRemover(slideName)}
                      />
       </div>
-      <div>
-        <FileNav />
-      </div>
     </div>
   );
 }
