@@ -60,7 +60,7 @@ const useTreeItemStyles = makeStyles((theme) => ({
   },
 }));
 
-function StyledTreeItem(props) {
+const StyledTreeItem = (props) => {
   const classes = useTreeItemStyles();
   const { labelText, labelIcon: LabelIcon, labelInfo, color, bgColor, ...other } = props;
 
@@ -118,7 +118,10 @@ const FileNav = () => {
     root: [
       {
         id: "1",
-        label: "Cohort"
+        type: "folder",
+        name: "Cohort",
+        path: "",
+        annotated: false
       }
     ],
     1: []
@@ -127,29 +130,45 @@ const FileNav = () => {
   const [tree, setTree] = useState(initialData);
 
   const handleChange = (event, nodeId) => {
-    console.log("toggle: ", nodeId);
     setTimeout(() => {
       const newTree = {
         ...tree,
         [nodeId]: [
           {
             id: "2",
-            label: "Calendar"
+            name: "Calendar",
+            type: "file"
           },
           {
             id: "3",
-            label: "Settings"
+            name: "Settings",
+            type: "file"
           },
           {
             id: "4",
-            label: "Music"
+            name: "Music",
+            type: "file"
           }
         ]
       };
 
       setTree(newTree);
-    }, 1000); // simulate xhr
+    }, 100); // simulate xhr
   };
+
+  const renderLeaf = (file) => {
+    console.log("rendering: ", file);
+    return (
+      <TreeItem
+        key={file.id}
+        nodeId={file.id}
+        label={file.name}
+        labelIcon={InsertDriveFileIcon}
+        labelText={file.name}
+        icon={<InsertDriveFileIcon/>}
+      />
+    )
+  }
 
   const renderTree = (children) => {
     return children.map(child => {
@@ -157,18 +176,23 @@ const FileNav = () => {
         tree[child.id] && tree[child.id].length > 0
           ? renderTree(tree[child.id])
           : [<div />];
-
-      return (
-        <StyledTreeItem
-          key={child.id}
-          nodeId={child.id}
-          label={child.label}
-          labelIcon={<FolderIcon />}
-          labelText={child.label}
-        >
-          {childrenNodes}
-        </StyledTreeItem>
-      );
+      if (child.type === "file") {
+        return (renderLeaf(child));
+      }
+      else {
+        return (
+          <TreeItem
+            key={child.id}
+            nodeId={child.id}
+            label={child.name}
+            labelText={child.name}
+            expandIcon={<FolderOpenIcon />}
+            collapseIcon={<FolderIcon />}
+          >
+            {childrenNodes}
+          </TreeItem>
+        );
+      }
     });
   };
 

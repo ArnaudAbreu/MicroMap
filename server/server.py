@@ -240,6 +240,15 @@ class SlideTree(Resource):
         folders, slides = children(wsi_path)
         annots = annots_from_slide(slides, ROOT_WSI, ROOT_ANNOTS)
         res = []
+        for folder in folders:
+            res.append(
+                {
+                    "type": "folder",
+                    "name": os.path.basename(folder),
+                    "path": os.path.relpath(folder, ROOT_WSI),
+                    "annotated": False
+                }
+            )
         for slide, annot in zip(slides, annots):
             res.append(
                 {

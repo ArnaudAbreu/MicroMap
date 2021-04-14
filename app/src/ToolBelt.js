@@ -234,7 +234,7 @@ const ToolBelt = ({classList, displayOnSwitch, editOnRadioChange, slides, resetS
 
         <div style={{marginTop: "35px"}}>
           <Typography gutterBottom variant="h6">
-              Server Root
+              Root
           </Typography>
         </div>
 
