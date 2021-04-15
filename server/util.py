@@ -33,7 +33,7 @@ def children(folder):
             folders.append(path)
         else:
             files.append(path)
-    return folders.sort(), files.sort()
+    return sorted(folders), sorted(files)
 
 
 def _annot_from_slide(slide, slide_root, annot_root):

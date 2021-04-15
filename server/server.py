@@ -231,11 +231,20 @@ class Annotation(Resource):
         return "", 204
 
 
+path_parser = reqparse.RequestParser()
+path_parser.add_argument("path", location="json")
+
+
 class SlideTree(Resource):
     """A class to handle file navigation requests."""
 
-    def get(self, path):
+    def post(self):
         """Answer GET requests."""
+        args = path_parser.parse_args()
+        path = args.path
+        print("requested path: {}".format(path))
+        if path is None:
+            return [], 201
         wsi_path = os.path.join(ROOT_WSI, path)
         folders, slides = children(wsi_path)
         annots = annots_from_slide(slides, ROOT_WSI, ROOT_ANNOTS)
@@ -258,10 +267,10 @@ class SlideTree(Resource):
                     "annotated": os.path.exists(annot)
                 }
             )
-        return res
+        return res, 201
 
 
-api.add_resource(SlideTree, "/nav/<path>")
+api.add_resource(SlideTree, "/nav/")
 api.add_resource(SlideList, "/slides")
 api.add_resource(Slide, "/slides/<slide_ID>")
 api.add_resource(Tile, "/slides/<slide_ID>/<int:level>/<int:col>_<int:row>.<fmt>")

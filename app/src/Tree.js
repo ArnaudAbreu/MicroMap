@@ -8,15 +8,17 @@ import { makeStyles } from '@material-ui/core/styles';
 import TreeItem from '@material-ui/lab/TreeItem';
 import TreeView from '@material-ui/lab/TreeView';
 import Typography from '@material-ui/core/Typography';
+import { getFiles } from "./WSI";
 
 const useTreeItemStyles = makeStyles((theme) => ({
   root: {
+    marginLeft: 0,
     color: theme.palette.text.secondary,
     '&:hover > $content': {
       backgroundColor: theme.palette.action.hover,
     },
     '&:focus > $content, &$selected > $content': {
-      backgroundColor: `var(--tree-view-bg-color, ${theme.palette.grey[400]})`,
+      backgroundColor: `var(--tree-view-bg-color, '${theme.palette.grey[400]}')`,
       color: 'var(--tree-view-color)',
     },
     '&:focus > $content $label, &:hover > $content $label, &$selected > $content $label': {
@@ -32,6 +34,7 @@ const useTreeItemStyles = makeStyles((theme) => ({
     '$expanded > &': {
       fontWeight: theme.typography.fontWeightRegular,
     },
+    marginLeft: 0,
   },
   group: {
     marginLeft: 0,
@@ -48,28 +51,36 @@ const useTreeItemStyles = makeStyles((theme) => ({
   labelRoot: {
     display: 'flex',
     alignItems: 'center',
-    padding: theme.spacing(0.5, 0),
+    // padding: theme.spacing(0.5, 0),
   },
   labelIcon: {
     marginRight: theme.spacing(1),
+    align: 'left'
   },
   labelText: {
     fontWeight: 'inherit',
     flexGrow: 1,
-    color: 'white'
+    color: 'white',
+    align: 'left'
+  },
+  parentNode: {
+    "& ul li $content": {
+      // child left padding
+      paddingLeft: `calc(var(--node-depth) * ${theme.spacing(2)}px)`
+    }
   },
 }));
 
 const StyledTreeItem = (props) => {
   const classes = useTreeItemStyles();
-  const { labelText, labelIcon: LabelIcon, labelInfo, color, bgColor, ...other } = props;
+  const { children, labelText, labelIcon: LabelIcon, labelInfo, color, bgColor, depth = 0, ...other } = props;
 
   return (
     <TreeItem
       label={
-        <div className={classes.labelRoot}>
+        <div className={props.children ? classes.parentNode : undefined}>
           <LabelIcon color="inherit" className={classes.labelIcon} />
-          <Typography variant="body2" className={classes.labelText}>
+          <Typography variant="body2" align="left" className={classes.labelText}>
             {labelText}
           </Typography>
           <Typography variant="caption" color="inherit">
@@ -80,6 +91,7 @@ const StyledTreeItem = (props) => {
       style={{
         '--tree-view-color': color,
         '--tree-view-bg-color': bgColor,
+        "--node-depth": depth,
       }}
       classes={{
         root: classes.root,
@@ -90,14 +102,19 @@ const StyledTreeItem = (props) => {
         label: classes.label,
       }}
       {...other}
-    />
+      >
+      {React.Children.map(children, (child) => {
+        // includ depht property to child element
+        return React.cloneElement(child, { depth: depth + 1 });
+      })}
+    </TreeItem>
   );
 }
 
 StyledTreeItem.propTypes = {
   bgColor: PropTypes.string,
   color: PropTypes.string,
-  labelIcon: PropTypes.elementType.isRequired,
+  // labelIcon: PropTypes.elementType.isRequired,
   labelInfo: PropTypes.string,
   labelText: PropTypes.string.isRequired,
 };
@@ -106,7 +123,7 @@ const useStyles = makeStyles({
   root: {
     height: 264,
     flexGrow: 1,
-    maxWidth: 400,
+    maxWidth: 400
   },
 });
 
@@ -117,53 +134,55 @@ const FileNav = () => {
   const initialData = {
     root: [
       {
-        id: "1",
         type: "folder",
         name: "Cohort",
-        path: "",
+        path: "Cohort",
         annotated: false
       }
     ],
-    1: []
   };
 
   const [tree, setTree] = useState(initialData);
+  const [isInit, setIsInit] = useState(false);
+
+  const getInitialData = async () => {
+    const response = await getFiles("coucou");
+    let root_folders = await response.data;
+    setTree(
+      {
+        root: root_folders
+      }
+    );
+  }
+
+  const getNodeData = async (nodeId) => {
+    const response = await getFiles(nodeId);
+    let subfolders = await response.data;
+    const newTree = {
+      ...tree,
+      [nodeId]: subfolders
+    };
+    setTree(newTree);
+  }
+
+  useEffect(() => {
+    if (isInit === false){
+      getInitialData();
+      setIsInit(true);
+    }
+  }, []);
 
   const handleChange = (event, nodeId) => {
-    setTimeout(() => {
-      const newTree = {
-        ...tree,
-        [nodeId]: [
-          {
-            id: "2",
-            name: "Calendar",
-            type: "file"
-          },
-          {
-            id: "3",
-            name: "Settings",
-            type: "file"
-          },
-          {
-            id: "4",
-            name: "Music",
-            type: "file"
-          }
-        ]
-      };
-
-      setTree(newTree);
-    }, 100); // simulate xhr
+    getNodeData(nodeId[0]);
   };
 
   const renderLeaf = (file) => {
-    console.log("rendering: ", file);
     return (
-      <TreeItem
-        key={file.id}
-        nodeId={file.id}
+      <StyledTreeItem
+        key={file.path}
+        nodeId={file.path}
         label={file.name}
-        labelIcon={InsertDriveFileIcon}
+        bgColor={'white'}
         labelText={file.name}
         icon={<InsertDriveFileIcon/>}
       />
@@ -171,26 +190,28 @@ const FileNav = () => {
   }
 
   const renderTree = (children) => {
+    //console.log("Children: ", children);
     return children.map(child => {
       const childrenNodes =
-        tree[child.id] && tree[child.id].length > 0
-          ? renderTree(tree[child.id])
+        tree[child.path] && tree[child.path].length > 0
+          ? renderTree(tree[child.path])
           : [<div />];
       if (child.type === "file") {
         return (renderLeaf(child));
       }
       else {
         return (
-          <TreeItem
-            key={child.id}
-            nodeId={child.id}
+          <StyledTreeItem
+            key={child.path}
+            nodeId={child.path}
             label={child.name}
             labelText={child.name}
+            bgColor={'white'}
             expandIcon={<FolderOpenIcon />}
             collapseIcon={<FolderIcon />}
           >
             {childrenNodes}
-          </TreeItem>
+          </StyledTreeItem>
         );
       }
     });
@@ -201,6 +222,7 @@ const FileNav = () => {
       className={classes.root}
       defaultCollapseIcon={<FolderIcon />}
       defaultExpandIcon={<FolderOpenIcon />}
+      defaultEndIcon={<div style={{ width: 24 }} />}
       onNodeToggle={handleChange}
     >
       {renderTree(tree.root)}

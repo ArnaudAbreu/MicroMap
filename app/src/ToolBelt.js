@@ -22,6 +22,7 @@ import { BasicTextFields } from './AddLayer'
 import { FileNav } from './Tree';
 
 const drawerWidth = 240;
+// const drawerWidth = 500;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -244,7 +245,7 @@ const ToolBelt = ({classList, displayOnSwitch, editOnRadioChange, slides, resetS
             root: classes.divider,
           }} />
 
-        <div style={{marginTop: "35px", marginLeft: "25px"}}>
+        <div style={{marginTop: "35px", marginLeft: "35px"}}>
           <FileNav />
         </div>
 
