@@ -33,6 +33,7 @@ def children(folder):
             folders.append(path)
         else:
             files.append(path)
+    files = filtered_paths(files)
     return sorted(folders), sorted(files)
 
 

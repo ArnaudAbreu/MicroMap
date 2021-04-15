@@ -22,7 +22,7 @@ import { BasicTextFields } from './AddLayer'
 import { FileNav } from './Tree';
 
 const drawerWidth = 240;
-// const drawerWidth = 500;
+const drawerNavWidth = 500;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -53,6 +53,15 @@ const useStyles = makeStyles((theme) => ({
   hide: {
     display: 'none',
   },
+  drawerNav: {
+    width: drawerNavWidth,
+    flexShrink: 0,
+  },
+  drawerPaperNav: {
+    width: drawerNavWidth,
+    background: '#282c34',
+    color: 'white'
+  },
   drawer: {
     width: drawerWidth,
     flexShrink: 0,
@@ -61,6 +70,14 @@ const useStyles = makeStyles((theme) => ({
     width: drawerWidth,
     background: '#282c34',
     color: 'white'
+  },
+  drawerNavHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: theme.spacing(0, 1),
+    // necessary for content to be below app bar
+    ...theme.mixins.toolbar,
+    // justifyContent: 'flex-end',
   },
   drawerHeader: {
     display: 'flex',
@@ -210,15 +227,15 @@ const ToolBelt = ({classList, displayOnSwitch, editOnRadioChange, slides, resetS
 
 
       <Drawer
-        className={classes.drawer}
+        className={classes.drawerNav}
         variant="persistent"
         anchor="right"
         open={navOpen}
         classes={{
-          paper: classes.drawerPaper,
+          paper: classes.drawerPaperNav,
         }}
       >
-        <div className={classes.drawerHeader}>
+        <div className={classes.drawerNavHeader}>
           <IconButton onClick={handleNavDrawerClose}>
             {theme.direction === 'ltr' ? <ChevronRightIcon style={{fill: "white"}}/> : <ChevronLeftIcon style={{fill: "white"}}/>}
           </IconButton>

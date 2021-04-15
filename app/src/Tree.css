@@ -1,0 +1,35 @@
+.MuiTreeItem-label {
+    width: 100%;
+    position: relative;
+    padding-left: 4px;
+    text-align: left;
+    display: inline-flex;
+    float: left;
+    overflow: hidden;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 100%;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  top: -20px;
+  right: 5%;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
