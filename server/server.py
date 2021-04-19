@@ -5,11 +5,34 @@ from flask_restful import reqparse, abort, Api, Resource
 from flask_cors import CORS
 from io import BytesIO
 from wsi import slides_in_folder, slide_info_to_dict
-from hand_annotation import get_annotation_from_slide_id, set_annotation_to_slide_id
+from hand_annotation import (
+    get_annotation_from_slide_id,
+    set_annotation_to_slide_id,
+    get_annotation_from_json_path,
+    set_annotation_to_json_path
+)
 from tqdm import tqdm
 from openslide.deepzoom import DeepZoomGenerator
 import ast
 from util import children, annots_from_slide
+import logging
+
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+c_handler = logging.StreamHandler()
+f_handler = logging.FileHandler('micromap_server.log')
+c_handler.setLevel(logging.DEBUG)
+f_handler.setLevel(logging.DEBUG)
+c_format = logging.Formatter('%(name)s - [%(levelname)s] - %(message)s')
+f_format = logging.Formatter(
+    '%(asctime)s - %(name)s - [%(levelname)s] - %(message)s'
+)
+c_handler.setFormatter(c_format)
+f_handler.setFormatter(f_format)
+logger.addHandler(c_handler)
+logger.addHandler(f_handler)
+
 
 app = Flask(__name__)
 CORS(app)
@@ -30,6 +53,7 @@ DEEPZOOM_LIMIT_BOUNDS = False
 DEEPZOOM_TILE_QUALITY = 75
 ROOT_WSI = "/data/slides"
 ROOT_ANNOTS = "/data/annots"
+
 SLIDES = dict()
 for s in tqdm(iterable=slides_in_folder(ROOT_WSI), ascii=True):
     try:
@@ -38,7 +62,7 @@ for s in tqdm(iterable=slides_in_folder(ROOT_WSI), ascii=True):
         openslide.lowlevel.OpenSlideUnsupportedFormatError,
         openslide.lowlevel.OpenSlideError,
     ) as e:
-        print(e)
+        logger.info(e)
 
 TILERS = {
     slidename: DeepZoomGenerator(
@@ -50,16 +74,65 @@ TILERS = {
     for slidename, slide in tqdm(SLIDES.items(), ascii=True)
 }
 
+path_parser = reqparse.RequestParser()
+path_parser.add_argument("path", location="json")
 
-def abort_if_slide_does_not_exist(slide_id):
-    """Do nothing stupid if the requested slide does not exists."""
-    if slide_id not in SLIDES:
-        abort(
-            404,
-            message="Slide {} doesn't exist! See slidenames: {}".format(
-                slide_id, SLIDES
-            ),
+annot_parser = reqparse.RequestParser()
+annot_parser.add_argument("annotation", location="json")
+
+annot_and_path_parser = reqparse.RequestParser()
+annot_and_path_parser.add_argument("path", location="json")
+annot_and_path_parser.add_argument("annotation", location="json")
+
+
+def get_slide(slide_path):
+    """Create openslide slide from slide_path."""
+    base = os.path.basename(slide_path)
+    if base in SLIDES:
+        return SLIDES[base], TILERS[base]
+    # slide_path does not know the actual roots on server
+    full_path = os.path.join(ROOT_WSI, slide_path)
+    try:
+        slide = openslide.OpenSlide(full_path)
+        tiler = DeepZoomGenerator(
+            slide,
+            tile_size=DEEPZOOM_TILE_SIZE,
+            overlap=DEEPZOOM_OVERLAP,
+            limit_bounds=DEEPZOOM_LIMIT_BOUNDS
         )
+        SLIDES[base] = slide
+        TILERS[base] = tiler
+    except (
+        openslide.lowlevel.OpenSlideUnsupportedFormatError,
+        openslide.lowlevel.OpenSlideError,
+    ) as e:
+        logger.info(e)
+    return slide, tiler
+
+
+def get_annotation(slide_path):
+    """Return (and create if necessary) annotation file for a slide."""
+    rel_folder = os.path.dirname(slide_path)
+    slide_id = os.path.basename(slide_path)
+    slide_prefix, _ = os.path.splitext(slide_id)
+    # slide_path does not know the actual roots on server
+    annot_folder = os.path.join(ROOT_ANNOTS, rel_folder)
+    annot_file = os.path.join(annot_folder, "{}.json".format(slide_prefix))
+    annot, existed = get_annotation_from_json_path(annot_file, slide_id)
+    return annot, existed
+
+
+def set_annotation(slide_path, annot):
+    """Return (and create if necessary) annotation file for a slide."""
+    logger.info("Getting inside annotation writing function")
+    rel_folder = os.path.dirname(slide_path)
+    slide_id = os.path.basename(slide_path)
+    slide_prefix, _ = os.path.splitext(slide_id)
+    # slide_path does not know the actual roots on server
+    annot_folder = os.path.join(ROOT_ANNOTS, rel_folder)
+    annot_file = os.path.join(annot_folder, "{}.json".format(slide_prefix))
+    logger.info("Going to write annotations in file: {}".format(annot_file))
+    set_annotation_to_json_path(annot_file, annot)
 
 
 def abort_if_format_does_not_exist(fmt):
@@ -84,13 +157,12 @@ class PILBytesIO(BytesIO):
 class Slide(Resource):
     """A class to handle slide info requests."""
 
-    def get(self, slide_ID):
+    def post(self, slide_ID):
         """Answer GET requests."""
-        print(slide_ID)
-        print(type(slide_ID))
-        # slide_id = slide_ID.encode("raw_unicode_escape").decode("utf-8")
-        abort_if_slide_does_not_exist(slide_ID)
-        slide = SLIDES[slide_ID]
+        args = path_parser.parse_args()
+        path = args.path
+        logger.info("requested slide: {}".format(path))
+        slide, _ = get_slide(path)
         res = slide_info_to_dict(slide)
         res["source"]["Image"]["Url"] = "http://{}/slides/{}/".format(
             request.host, slide_ID
@@ -112,22 +184,23 @@ class Tile(Resource):
 
     def get(self, slide_ID, level, col, row, fmt):
         """Answer GET requests."""
-        print(
+        logger.info(
             "Received following request: level: {}, x: {}, y: {}, format: {}, slide: {}".format(
                 level, col, row, fmt, slide_ID
-            )
+            ),
         )
-        # slide_id = slide_ID.encode("raw_unicode_escape").decode("utf-8")
-        abort_if_slide_does_not_exist(slide_ID)
-        slide = TILERS[slide_ID]
+        tiler = TILERS[slide_ID]
         fmt = fmt.lower()
         abort_if_format_does_not_exist(fmt)
         try:
-            tile = slide.get_tile(level, (col, row))
+            tile = tiler.get_tile(level, (col, row))
         except ValueError:
             # Invalid level or coordinates
             abort(
-                404, "Invalid coords -> level: {}, x: {}, y: {}".format(level, col, row)
+                404,
+                "Invalid coords -> level: {}, x: {}, y: {}".format(
+                    level, col, row
+                )
             )
         buf = PILBytesIO()
         tile.save(buf, fmt, quality=DEEPZOOM_TILE_QUALITY)
@@ -139,31 +212,34 @@ class Tile(Resource):
 class SlideAnnotation(Resource):
     """A class to handle slide annotation requests."""
 
-    def get(self, slide_id):
+    def post(self, slide_id):
         """Answer GET requests."""
-        annot = get_annotation_from_slide_id(ROOT_ANNOTS, slide_id)
+        args = path_parser.parse_args()
+        path = args.path
+        logger.info("requested slide annotation: {}".format(path))
+        annot, existed = get_annotation(path)
         return annot
 
 
 class LayerList(Resource):
     """A class to handle list of layers request."""
 
-    def get(self, slide_id):
+    def post(self, slide_id):
         """Answer GET requests."""
-        annot = get_annotation_from_slide_id(ROOT_ANNOTS, slide_id)
+        args = path_parser.parse_args()
+        path = args.path
+        annot, existed = get_annotation(path)
         return [{"id": ann["id"], "color": ann["color"]} for ann in annot["layers"]]
-
-
-parser = reqparse.RequestParser()
-parser.add_argument("annotation", location="json")
 
 
 class Layer(Resource):
     """A class to handle list of layers request."""
 
-    def get(self, slide_id, layer_id):
+    def post(self, slide_id, layer_id):
         """Answer GET requests."""
-        annot = get_annotation_from_slide_id(ROOT_ANNOTS, slide_id)
+        args = path_parser.parse_args()
+        path = args.path
+        annot, existed = get_annotation(path)
         for layer in annot["layers"]:
             if layer_id == layer["id"]:
                 return layer
@@ -173,7 +249,7 @@ class Layer(Resource):
             "shapes": []
         }
         annot["layers"].append(new_layer)
-        set_annotation_to_slide_id(ROOT_ANNOTS, slide_id, annot)
+        set_annotation(path, annot)
         return new_layer
 
 
@@ -182,57 +258,65 @@ class Annotation(Resource):
 
     def post(self, slide_id, layer_id):
         """Answer POST requests."""
-        args = parser.parse_args()
-        annot = get_annotation_from_slide_id(ROOT_ANNOTS, slide_id)
-
-        print(args["annotation"])
-
-        annot_sent = ast.literal_eval(args["annotation"])
-
+        # logger.info("Layer ID requested: {}".format(layer_id))
+        # logger.info("Slide requested: {}".format(slide_id))
+        args = annot_and_path_parser.parse_args()
+        path = args.path
+        sent = args.annotation
+        # logger.info("Annotation sent: {}".format(sent))
+        # logger.info("Annotation type: {}".format(type(sent)))
+        annot, existed = get_annotation(path)
+        # logger.info(args["annotation"])
+        annot_sent = ast.literal_eval(sent)
+        # logger.info("Converted sent: {}".format(annot_sent))
+        # logger.info("Converted sent has format: {}".format(type(annot_sent)))
+        # logger.info("Existing annotation: {}".format(annot))
         for layer in annot["layers"]:
             if layer_id == layer["id"]:
+                # logger.info("found the layer id !")
+                # logger.info("matched layer: {}".format(layer))
                 layer["shapes"].append(annot_sent)
-
-                # print("annotation sent has id: ", annot_sent.id)
-
-                set_annotation_to_slide_id(ROOT_ANNOTS, slide_id, annot)
+                # logger.info("annotation sent has id: ", annot_sent["id"])
+                set_annotation(path, annot)
                 return annot_sent, 201
 
     def delete(self, slide_id, layer_id):
         """Answer DELETE requests."""
-        args = parser.parse_args()
-        print(args)
-        to_delete = ast.literal_eval(args["annotation"])
+        args = annot_and_path_parser.parse_args()
+        path = args.path
+        sent = args.annotation
+        # logger.info(args)
+        to_delete = ast.literal_eval(sent)
         to_delete_id = to_delete["id"]
-        annot = get_annotation_from_slide_id(ROOT_ANNOTS, slide_id)
+        annot, existed = get_annotation(path)
         was_deleted = False
-        new_layer = dict()
-        layer_idx = 0
+        new_annot = {k: v for k, v in annot.items() if k != "layers"}
+        new_annot["layers"] = []
         for layer in annot["layers"]:
-            if layer_id == layer["id"]:
-                new_layer["id"] = layer_id
-                new_layer["color"] = layer["color"]
+            new_layer = {k: v for k, v in layer.items() if k != "shapes"}
+            if layer["id"] != layer_id:
+                new_layer["shapes"] = layer["shapes"]
+            else:
                 new_layer["shapes"] = []
                 for shape in layer["shapes"]:
                     if shape["id"] != to_delete_id:
                         new_layer["shapes"].append(shape)
                     else:
-                        print("Annotation: {} has been deleted!".format(to_delete))
-            layer_idx += 1
+                        logger.info("Annotation: {} has been deleted!".format(to_delete))
+                        was_deleted = True
+            new_annot["layers"].append(new_layer)
+
+        set_annotation(path, new_annot)
         if was_deleted:
-            annot["layers"][layer_idx] = new_layer
-            set_annotation_to_slide_id(ROOT_ANNOTS, slide_id, annot)
+            logger.info("Successfully deleted annotation!")
         else:
-            print(
+            logger.warning(
                 "Could not find annotation id: {} in following annotations:".format(
                     to_delete_id
-                )
+                ),
+
             )
         return "", 204
-
-
-path_parser = reqparse.RequestParser()
-path_parser.add_argument("path", location="json")
 
 
 class SlideTree(Resource):
@@ -242,7 +326,7 @@ class SlideTree(Resource):
         """Answer GET requests."""
         args = path_parser.parse_args()
         path = args.path
-        print("requested path: {}".format(path))
+        logger.info("requested path: {}".format(path))
         if path is None:
             return [], 201
         wsi_path = os.path.join(ROOT_WSI, path)

@@ -35,14 +35,14 @@ def get_annotation_from_json_path(jsonpath, slide_id):
     """
     if os.path.exists(jsonpath):
         with open(jsonpath, "r") as f:
-            return json.load(f)
+            return json.load(f), True
     annot = {
         "slide_id": slide_id,
         "layers": []
     }
     with open(jsonpath, "w") as f:
         json.dump(annot, f)
-    return annot
+    return annot, False
 
 
 def set_annotation_to_json_path(jsonpath, annot):
@@ -85,4 +85,5 @@ def get_annotation_from_slide_id(folder, slide_id):
 
     """
     jsonpath = get_annotation_path(folder, slide_id)
-    return get_annotation_from_json_path(jsonpath, slide_id)
+    annot, _ = get_annotation_from_json_path(jsonpath, slide_id)
+    return annot
