@@ -10,14 +10,21 @@ import TreeView from '@material-ui/lab/TreeView';
 import Typography from '@material-ui/core/Typography';
 import { getFiles } from "./WSI";
 import './Tree.css';
-import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
+import { createMuiTheme, ThemeProvider, MuiThemeProvider } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
   root: {
     height: 264,
-    flexGrow: 1,
-    maxWidth: 240
+    flexGrow: 1
   },
+});
+
+const theme = createMuiTheme({
+  palette: {
+    secondary: {
+      main: '#3EB2E3'
+    }
+  }
 });
 
 
@@ -65,6 +72,19 @@ const FileNav = ({onFileClick, reset}) => {
     );
   }
 
+  const writeVisitedLabel = (label, path) => {
+    return (
+      <div style={{overflow: "hidden", textOverflow: "ellipsis"}}>
+        <MuiThemeProvider theme={theme}>
+          <Typography noWrap color='secondary'>
+            {label}
+          </Typography>
+        </MuiThemeProvider>
+      </div>
+
+    );
+  }
+
   const getNodeData = async (nodeId) => {
     const response = await getFiles(nodeId);
     let subfolders = await response.data;
@@ -91,16 +111,28 @@ const FileNav = ({onFileClick, reset}) => {
       evt.preventDefault();
       handleSlideClick(file);
     }
-    return (
-      <TreeItem
-        key={file.path}
-        nodeId={file.path}
-        label={writeLabel(file.name, file.path)}
-        bgColor={'white'}
-        onLabelClick={onClickLeaf}
-        icon={<InsertDriveFileIcon/>}>
-      </TreeItem>
-    )
+    if (file.annotated) {
+      return (
+        <TreeItem
+          key={file.path}
+          nodeId={file.path}
+          label={writeVisitedLabel(file.name, file.path)}
+          onLabelClick={onClickLeaf}
+          icon={<InsertDriveFileIcon/>}>
+        </TreeItem>
+      );
+    }
+    else {
+      return (
+        <TreeItem
+          key={file.path}
+          nodeId={file.path}
+          label={writeLabel(file.name, file.path)}
+          onLabelClick={onClickLeaf}
+          icon={<InsertDriveFileIcon/>}>
+        </TreeItem>
+      );
+    }
   }
 
   const renderTree = (children) => {
