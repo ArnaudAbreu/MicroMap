@@ -256,7 +256,9 @@ const ToolBelt = ({
             root: classes.divider,
           }} />
 
-        <FileNav onFileClick={resetSlide} reset={resetInit}/>
+        <div style={{marginTop: "35px", marginLeft: "15px"}}>
+          <FileNav onFileClick={resetSlide} reset={resetInit}/>
+        </div>
 
       </Drawer>
 
