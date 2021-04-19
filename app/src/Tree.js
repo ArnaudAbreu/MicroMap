@@ -16,23 +16,12 @@ const useStyles = makeStyles({
   root: {
     height: 264,
     flexGrow: 1,
-    maxWidth: 500
+    maxWidth: 240
   },
 });
 
-const writeLabel = (label) => {
-  return (
-    <div style={{overflow: "hidden", textOverflow: "ellipsis"}}>
-      <Typography noWrap>
-        {label}
-      </Typography>
-    </div>
 
-  );
-}
-
-
-const FileNav = () => {
+const FileNav = ({onFileClick, reset}) => {
   const classes = useStyles();
 
   const initialData = {
@@ -46,6 +35,12 @@ const FileNav = () => {
     ],
   };
 
+  const handleSlideClick = (file) => {
+    console.log("Changing slide: ", file);
+    reset();
+    onFileClick(file.name);
+  }
+
   const [tree, setTree] = useState(initialData);
   const [isInit, setIsInit] = useState(false);
 
@@ -56,6 +51,17 @@ const FileNav = () => {
       {
         root: root_folders
       }
+    );
+  }
+
+  const writeLabel = (label, path) => {
+    return (
+      <div style={{overflow: "hidden", textOverflow: "ellipsis"}}>
+        <Typography noWrap>
+          {label}
+        </Typography>
+      </div>
+
     );
   }
 
@@ -81,12 +87,17 @@ const FileNav = () => {
   };
 
   const renderLeaf = (file) => {
+    const onClickLeaf = (evt) => {
+      evt.preventDefault();
+      handleSlideClick(file);
+    }
     return (
       <TreeItem
         key={file.path}
         nodeId={file.path}
-        label={writeLabel(file.name)}
+        label={writeLabel(file.name, file.path)}
         bgColor={'white'}
+        onLabelClick={onClickLeaf}
         icon={<InsertDriveFileIcon/>}>
       </TreeItem>
     )
@@ -124,7 +135,6 @@ const FileNav = () => {
       className={classes.root}
       defaultCollapseIcon={<FolderIcon />}
       defaultExpandIcon={<FolderOpenIcon />}
-      defaultEndIcon={<div style={{ width: 24 }} />}
       onNodeToggle={handleChange}
     >
       {renderTree(tree.root)}

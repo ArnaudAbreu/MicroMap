@@ -20,9 +20,10 @@ import { EditBoard } from './EditBoard';
 import { SlideSelector } from './SlideSelector';
 import { BasicTextFields } from './AddLayer'
 import { FileNav } from './Tree';
+import { AppTitleTest } from './AppTitle'
 
 const drawerWidth = 240;
-const drawerNavWidth = 500;
+const drawerNavWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -105,7 +106,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ToolBelt = ({classList, displayOnSwitch, editOnRadioChange, slides, resetSlide, resetInit, addLayer}) => {
+const ToolBelt = ({
+  classList,
+  displayOnSwitch,
+  editOnRadioChange,
+  slides,
+  resetSlide,
+  resetInit,
+  addLayer
+}) => {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = useState(false);
@@ -153,9 +162,7 @@ const ToolBelt = ({classList, displayOnSwitch, editOnRadioChange, slides, resetS
           >
             <ChevronRightIcon />
           </IconButton>
-          <SlideSelector slides={slides}
-                         resetImage={resetSlide}
-                         resetInit={resetInit}/>
+          <AppTitleTest />
          <IconButton
            color="inherit"
            aria-label="open drawer right"
@@ -249,22 +256,7 @@ const ToolBelt = ({classList, displayOnSwitch, editOnRadioChange, slides, resetS
             root: classes.divider,
           }} />
 
-
-        <div style={{marginTop: "35px"}}>
-          <Typography gutterBottom variant="h6">
-              Root
-          </Typography>
-        </div>
-
-        <Divider
-          variant="middle"
-          classes={{
-            root: classes.divider,
-          }} />
-
-        <div style={{marginTop: "35px", marginLeft: "35px"}}>
-          <FileNav />
-        </div>
+        <FileNav onFileClick={resetSlide} reset={resetInit}/>
 
       </Drawer>
 
