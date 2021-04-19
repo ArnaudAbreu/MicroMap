@@ -86,7 +86,7 @@ const LayerTest = ({drawing, color, label, pos, send, request, remove}) => {
     return {
       points: points,
       id: new_idx,
-      author: "arnaud",
+      author: "anonymous",
       text: "",
       label: label,
       color: color,
@@ -112,7 +112,7 @@ const LayerTest = ({drawing, color, label, pos, send, request, remove}) => {
     return {
       points: rel2abs(points, pos),
       id: "",
-      author: "arnaud",
+      author: "anonymous",
       text: "",
       label: label,
       color: color,
