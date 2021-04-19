@@ -9,6 +9,7 @@ from hand_annotation import get_annotation_from_slide_id, set_annotation_to_slid
 from tqdm import tqdm
 from openslide.deepzoom import DeepZoomGenerator
 import ast
+from util import children, annots_from_slide
 
 app = Flask(__name__)
 CORS(app)
@@ -230,6 +231,46 @@ class Annotation(Resource):
         return "", 204
 
 
+path_parser = reqparse.RequestParser()
+path_parser.add_argument("path", location="json")
+
+
+class SlideTree(Resource):
+    """A class to handle file navigation requests."""
+
+    def post(self):
+        """Answer GET requests."""
+        args = path_parser.parse_args()
+        path = args.path
+        print("requested path: {}".format(path))
+        if path is None:
+            return [], 201
+        wsi_path = os.path.join(ROOT_WSI, path)
+        folders, slides = children(wsi_path)
+        annots = annots_from_slide(slides, ROOT_WSI, ROOT_ANNOTS)
+        res = []
+        for folder in folders:
+            res.append(
+                {
+                    "type": "folder",
+                    "name": os.path.basename(folder),
+                    "path": os.path.relpath(folder, ROOT_WSI),
+                    "annotated": False
+                }
+            )
+        for slide, annot in zip(slides, annots):
+            res.append(
+                {
+                    "type": "file",
+                    "name": os.path.basename(slide),
+                    "path": os.path.relpath(slide, ROOT_WSI),
+                    "annotated": os.path.exists(annot)
+                }
+            )
+        return res, 201
+
+
+api.add_resource(SlideTree, "/nav/")
 api.add_resource(SlideList, "/slides")
 api.add_resource(Slide, "/slides/<slide_ID>")
 api.add_resource(Tile, "/slides/<slide_ID>/<int:level>/<int:col>_<int:row>.<fmt>")

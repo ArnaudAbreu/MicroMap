@@ -20,11 +20,8 @@ services:
     command: "npm start"
     volumes:
       - ./app:/app
-      - node-modules:/app/node_modules
+      - /app/node_modules
     ports:
       - "${REACT_APP_PORT}:3000"
     depends_on:
       - server
-
-volumes:
-  node-modules:

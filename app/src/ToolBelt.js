@@ -19,8 +19,11 @@ import { DisplayBoard } from './DisplayBoard';
 import { EditBoard } from './EditBoard';
 import { SlideSelector } from './SlideSelector';
 import { BasicTextFields } from './AddLayer'
+import { FileNav } from './Tree';
+import { AppTitleTest } from './AppTitle'
 
 const drawerWidth = 240;
+const drawerNavWidth = 240;
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -51,6 +54,15 @@ const useStyles = makeStyles((theme) => ({
   hide: {
     display: 'none',
   },
+  drawerNav: {
+    width: drawerNavWidth,
+    flexShrink: 0,
+  },
+  drawerPaperNav: {
+    width: drawerNavWidth,
+    background: '#282c34',
+    color: 'white'
+  },
   drawer: {
     width: drawerWidth,
     flexShrink: 0,
@@ -59,6 +71,14 @@ const useStyles = makeStyles((theme) => ({
     width: drawerWidth,
     background: '#282c34',
     color: 'white'
+  },
+  drawerNavHeader: {
+    display: 'flex',
+    alignItems: 'center',
+    padding: theme.spacing(0, 1),
+    // necessary for content to be below app bar
+    ...theme.mixins.toolbar,
+    // justifyContent: 'flex-end',
   },
   drawerHeader: {
     display: 'flex',
@@ -86,10 +106,19 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ToolBelt = ({classList, displayOnSwitch, editOnRadioChange, slides, resetSlide, resetInit, addLayer}) => {
+const ToolBelt = ({
+  classList,
+  displayOnSwitch,
+  editOnRadioChange,
+  slides,
+  resetSlide,
+  resetInit,
+  addLayer
+}) => {
   const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -98,6 +127,14 @@ const ToolBelt = ({classList, displayOnSwitch, editOnRadioChange, slides, resetS
   const handleDrawerClose = () => {
     setOpen(false);
   };
+
+  const handleNavDrawerOpen = () => {
+    setNavOpen(true);
+  }
+
+  const handleNavDrawerClose = () => {
+    setNavOpen(false);
+  }
 
   useEffect(() => {
     // console.log("Debug ToolBelt: ");
@@ -125,9 +162,16 @@ const ToolBelt = ({classList, displayOnSwitch, editOnRadioChange, slides, resetS
           >
             <ChevronRightIcon />
           </IconButton>
-          <SlideSelector slides={slides}
-                         resetImage={resetSlide}
-                         resetInit={resetInit}/>
+          <AppTitleTest />
+         <IconButton
+           color="inherit"
+           aria-label="open drawer right"
+           onClick={handleNavDrawerOpen}
+           edge="start"
+           className={clsx(classes.menuButton, open && classes.hide)}
+         >
+           <ChevronLeftIcon />
+         </IconButton>
         </Toolbar>
       </AppBar>
 
@@ -142,7 +186,7 @@ const ToolBelt = ({classList, displayOnSwitch, editOnRadioChange, slides, resetS
       >
         <div className={classes.drawerHeader}>
           <Typography gutterBottom variant="h4">
-              Tool Belt
+              Tools
           </Typography>
           <IconButton onClick={handleDrawerClose}>
             {theme.direction === 'ltr' ? <ChevronLeftIcon style={{fill: "white"}}/> : <ChevronRightIcon style={{fill: "white"}}/>}
@@ -185,6 +229,36 @@ const ToolBelt = ({classList, displayOnSwitch, editOnRadioChange, slides, resetS
         <EditBoard classList={classList} onRadioChange={editOnRadioChange} />
 
         <BasicTextFields addLayer={addLayer}/>
+
+      </Drawer>
+
+
+      <Drawer
+        className={classes.drawerNav}
+        variant="persistent"
+        anchor="right"
+        open={navOpen}
+        classes={{
+          paper: classes.drawerPaperNav,
+        }}
+      >
+        <div className={classes.drawerNavHeader}>
+          <IconButton onClick={handleNavDrawerClose}>
+            {theme.direction === 'ltr' ? <ChevronRightIcon style={{fill: "white"}}/> : <ChevronLeftIcon style={{fill: "white"}}/>}
+          </IconButton>
+          <Typography gutterBottom variant="h4">
+              Navigation
+          </Typography>
+        </div>
+
+        <Divider
+          classes={{
+            root: classes.divider,
+          }} />
+
+        <div style={{marginTop: "35px", marginLeft: "15px"}}>
+          <FileNav onFileClick={resetSlide} reset={resetInit}/>
+        </div>
 
       </Drawer>
 

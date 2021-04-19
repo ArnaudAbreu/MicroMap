@@ -11,6 +11,11 @@ const WSIAPI = axios.create({
   }
 });
 
+const NavAPI = axios.create({
+  baseURL: WSI_URL,
+  responseType: "json"
+});
+
 const getSlides = () => {
   return WSIAPI.get("/slides")
 }
@@ -19,8 +24,15 @@ const getSlide = (slidename) => {
   return WSIAPI.get("/slides/" + slidename)
 }
 
+const getFiles = (path) => {
+  const p = {path: path};
+  return NavAPI.post("/nav/", p)
+}
+
 export {
   WSIAPI,
+  NavAPI,
   getSlides,
-  getSlide
+  getSlide,
+  getFiles
 }
