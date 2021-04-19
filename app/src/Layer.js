@@ -3,6 +3,7 @@ import React, {
   useState
 } from "react";
 import { Annotation } from './Annotation';
+import { IdDialog } from './IdDialog';
 
 
 const gdate = () => {
@@ -64,6 +65,7 @@ const LayerTest = ({drawing, color, label, pos, send, request, remove}) => {
   const [hasNewShapes, setHasNewShapes] = useState(false);
   const [testData, setTestData] = useState([]);
   const [reqTest, setReqTest] = useState([]);
+  const [idOpen, setIdOpen] = useState(false);
 
   const getShapeList = async () => {
     const response = await request();
@@ -85,6 +87,20 @@ const LayerTest = ({drawing, color, label, pos, send, request, remove}) => {
       points: points,
       id: new_idx,
       author: "arnaud",
+      text: "",
+      label: label,
+      color: color,
+      date: date
+    };
+  }
+
+  const pointsToNamedAnnotationObj = (points, name) => {
+    const new_idx = guid();
+    const date = gdate();
+    return {
+      points: points,
+      id: new_idx,
+      author: name,
       text: "",
       label: label,
       color: color,
@@ -123,6 +139,16 @@ const LayerTest = ({drawing, color, label, pos, send, request, remove}) => {
     }
   }, []);
 
+  const createNewNamedAnnot = (name) => {
+    const annotobj = pointsToNamedAnnotationObj(currentShape, name);
+    const updatedAnnotations = shapeList.slice();
+    updatedAnnotations.push(annotobj);
+    setShapeList(updatedAnnotations);
+    send(annotobj);
+    setHasNewShapes(true);
+    setCurrentShape([]);
+  }
+
   const annotationList = (elements, flying) => {
     const listItems = elements.map((annot, idx) => {
         return(
@@ -143,6 +169,15 @@ const LayerTest = ({drawing, color, label, pos, send, request, remove}) => {
           remove={removeAnnot}
           key={elements.length}
         />
+      );
+    }
+    if (idOpen) {
+      listItems.push(
+        <IdDialog
+          trigger={createNewNamedAnnot}
+          keepOpen={setIdOpen}
+          opened={idOpen}
+          />
       );
     }
     return listItems;
@@ -207,7 +242,7 @@ const LayerTest = ({drawing, color, label, pos, send, request, remove}) => {
   const handleClick = (evt) => {
     if (isDrawing === true) {
       addPoint(evt);
-    } else {
+    } else if (idOpen === false) {
       setIsDrawing(true);
       addPoint(evt);
     }
@@ -239,7 +274,7 @@ const LayerTest = ({drawing, color, label, pos, send, request, remove}) => {
     evt.preventDefault();
     if (isDrawing && (currentShape.length > 0)) {
       setIsDrawing(false);
-      console.log("Finished current shape!", currentShape);
+      // console.log("Finished current shape!", currentShape);
       // before pushing anything to the list of annotation, we
       // have to format the annotation
       const annotobj = pointsToAnnotationObj(currentShape);
@@ -249,6 +284,17 @@ const LayerTest = ({drawing, color, label, pos, send, request, remove}) => {
       send(annotobj);
       setHasNewShapes(true);
       setCurrentShape([]);
+    }
+  }
+
+  const handleContextMenuTest = (evt) => {
+    evt.preventDefault();
+    if (isDrawing && (currentShape.length > 0)) {
+      setIsDrawing(false);
+      // console.log("Finished current shape!", currentShape);
+      // before pushing anything to the list of annotation, we
+      // have to format the annotation
+      setIdOpen(true);
     }
   }
 
@@ -270,7 +316,7 @@ const LayerTest = ({drawing, color, label, pos, send, request, remove}) => {
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         onMouseMove={handleMove}
-        onContextMenu={handleContextMenu}
+        onContextMenu={handleContextMenuTest}
         tabIndex="0"
       >
       {annotationList(shapeList, currentShape)}
