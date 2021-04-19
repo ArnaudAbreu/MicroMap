@@ -19,10 +19,15 @@
 /app/.env.test.local
 /app/.env.production.local
 /app/.eslintcache
+/app/.env.fish
+/app/.env.clair
 
 /app/npm-debug.log*
 /app/yarn-debug.log*
 /app/yarn-error.log*
+
+# logs
+/server/*.log
 
 # pycache
 __pycache__/
