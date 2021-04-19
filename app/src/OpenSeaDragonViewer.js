@@ -8,7 +8,18 @@ import React, {
 
 
 
-const OpenSeaDragonViewer = ({image, x, y, overlay, drawing, layers, isNone, layergetter, annotSetter, annotRemover}) => {
+const OpenSeaDragonViewer = ({
+  image,
+  x,
+  y,
+  overlay,
+  drawing,
+  layers,
+  isNone,
+  layergetter,
+  annotSetter,
+  annotRemover
+}) => {
 
   const [hasViewer, setHasViewer] = useState(false);
   const [viewer, setViewer] = useState(null);

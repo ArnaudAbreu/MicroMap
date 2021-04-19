@@ -7,16 +7,18 @@ const AnnotationAPI = axios.create({
   responseType: "json"
 });
 
-const getLayers = (slidename) => {
-  return AnnotationAPI.get("/layers/" + slidename);
+const getLayers = (slidepath, slidename) => {
+  const p = {path: slidepath}
+  return AnnotationAPI.post("/layers/" + slidename, p);
 }
 
 const createLayersGetter = (slidename) => {
   return (() => {getLayers(slidename)});
 }
 
-const getLayer = (slidename, layername) => {
-  return AnnotationAPI.get("/layers/" + slidename + "/" + layername);
+const getLayer = (slidepath, slidename, layername) => {
+  const p = {path: slidepath}
+  return AnnotationAPI.post("/layers/" + slidename + "/" + layername, p);
 }
 
 const createLayerGetter = (slidename) => {
@@ -34,26 +36,26 @@ const createShapeGetter = (getter, layername) => {
 //   return AnnotationAPI.post("/annotation/" + slidename + "/" + layername, annotation);
 // }
 
-const setLayer = (slidename, layername, shape) => {
-  const annotation = {annotation: shape};
+const setLayer = (slidepath, slidename, layername, shape) => {
+  const annotation = {annotation: shape, path: slidepath};
   return AnnotationAPI.post("/annotations/" + slidename + "/" + layername, annotation);
 }
 
-const createSlideSetter = (slidename) => {
-  return ((layername, shape) => {setLayer(slidename, layername, shape)});
+const createSlideSetter = (slidepath, slidename) => {
+  return ((layername, shape) => {setLayer(slidepath, slidename, layername, shape)});
 }
 
 const createLayerSetter = (setter, layername) => {
   return ((shape) => {setter(layername, shape)})
 }
 
-const removeFromLayer = (slidename, layername, shape) => {
-  const annotation = {annotation: shape};
+const removeFromLayer = (slidepath, slidename, layername, shape) => {
+  const annotation = {annotation: shape, path: slidepath};
   return AnnotationAPI.delete("/annotations/" + slidename + "/" + layername, {data: annotation});
 }
 
-const createSlideRemover = (slidename) => {
-  return ((layername, shape) => {removeFromLayer(slidename, layername, shape)});
+const createSlideRemover = (slidepath, slidename) => {
+  return ((layername, shape) => {removeFromLayer(slidepath, slidename, layername, shape)});
 }
 
 const createLayerRemover = (remover, layername) => {

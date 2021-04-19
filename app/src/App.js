@@ -16,44 +16,25 @@ import {
 
 function App() {
 
-  const [srvSlideList, setSrvSlideList] = useState([]);
   const x = 1200;
   const y = 800;
   const [selectedSrvImage, setSelectedSrvImage] = useState();
   const [annotLayers, setAnnotLayers] = useState([]);
   const [foundAnnotations, setFoundAnnotations] = useState(false);
   const [slideName, setSlideName] = useState("");
+  const [slidePath, setSlidePath] = useState("");
 
-  const getSrvSlides = async () => {
-    const response = await getSlides();
-    let srv_image = await response.data;
-    setSrvSlideList(srv_image);
-  }
-
-  useEffect(() => {
-    getSrvSlides();
-  }, []);
-
-  const getSrvImageInfo = async (slidename) => {
-    const response = await getSlide(slidename);
+  const getSrvImage = async (slidepath, slidename) => {
+    const response = await getSlide(slidepath, slidename);
     let srv_slide_info = await response.data;
-    const annotresponse = await getLayers(slidename);
+    const annotresponse = await getLayers(slidepath, slidename);
     let srv_annot_layers = await annotresponse.data;
     // console.log("annot_layers: ", srv_annot_layers)
+    setSlidePath(slidepath);
     setSelectedSrvImage(srv_slide_info);
     setAnnotLayers(srv_annot_layers);
     setFoundAnnotations(true);
     setSlideName(slidename);
-  }
-
-  const selectSrvImageByName = (name) => {
-    let selected = null;
-    for (const s in srvSlideList) {
-      if (srvSlideList[s] === name) {
-        selected = srvSlideList[s];
-      }
-    }
-    getSrvImageInfo(selected);
   }
 
   useEffect(() => {
@@ -63,9 +44,9 @@ function App() {
     console.log("-----------\n\n");
   });
 
-  const layerGetter = (name) => {
+  const layerGetter = (path, name) => {
     return ((lb) => {
-      return getLayer(name, lb)
+      return getLayer(path, name, lb)
     })
   }
 
@@ -76,13 +57,12 @@ function App() {
         <AnnotViewer img={selectedSrvImage}
                      x={x}
                      y={y}
-                     slides={srvSlideList}
                      annots={annotLayers}
                      foundAnnots={foundAnnotations}
-                     resetSlide={selectSrvImageByName}
-                     layergetter={layerGetter(slideName)}
-                     annotSetter={createSlideSetter(slideName)}
-                     annotRemover={createSlideRemover(slideName)}
+                     resetSlide={getSrvImage}
+                     layergetter={layerGetter(slidePath, slideName)}
+                     annotSetter={createSlideSetter(slidePath, slideName)}
+                     annotRemover={createSlideRemover(slidePath, slideName)}
                      />
       </div>
     </div>

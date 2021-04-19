@@ -31,7 +31,7 @@ const initAnnotations = (ann) => {
 }
 
 const AnnotViewer = ({img, x, y,
-                      overlay, slides,
+                      overlay,
                       foundAnnots,
                       annots,
                       resetSlide,
@@ -241,7 +241,6 @@ const AnnotViewer = ({img, x, y,
         <ToolBelt classList={layerList}
                   displayOnSwitch={changeDisplay}
                   editOnRadioChange={changeEdit}
-                  slides={slides}
                   resetSlide={resetSlide}
                   resetInit={reInit}
                   addLayer={addLayer}

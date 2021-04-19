@@ -43,9 +43,9 @@ const FileNav = ({onFileClick, reset}) => {
   };
 
   const handleSlideClick = (file) => {
-    console.log("Changing slide: ", file);
+    console.log("Changing slide: ", file.path);
     reset();
-    onFileClick(file.name);
+    onFileClick(file.path, file.name);
   }
 
   const [tree, setTree] = useState(initialData);

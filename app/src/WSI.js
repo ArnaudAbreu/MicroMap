@@ -20,13 +20,18 @@ const getSlides = () => {
   return WSIAPI.get("/slides")
 }
 
-const getSlide = (slidename) => {
-  return WSIAPI.get("/slides/" + slidename)
-}
+// const getSlide = (slidename) => {
+//   return WSIAPI.get("/slides/" + slidename)
+// }
 
 const getFiles = (path) => {
   const p = {path: path};
   return NavAPI.post("/nav/", p)
+}
+
+const getSlide = (slidepath, slidename) => {
+  const p = {path: slidepath};
+  return WSIAPI.post("/slides/" + slidename, p);
 }
 
 export {

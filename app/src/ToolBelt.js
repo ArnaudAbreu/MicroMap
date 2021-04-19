@@ -110,7 +110,6 @@ const ToolBelt = ({
   classList,
   displayOnSwitch,
   editOnRadioChange,
-  slides,
   resetSlide,
   resetInit,
   addLayer

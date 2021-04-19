@@ -94,8 +94,8 @@ const Annotation = ({shape, status, remove, edit}) => {
         anchorEl={anchorEl}
         keepMounted
         open={Boolean(anchorEl)}
-        onClose={handleClose}
-      >
+        onClose={handleClose}>
+
         <MenuItem onClick={handleDelete}>
           <ListItemIcon>
             <DeleteForeverIcon fontSize="small" />
@@ -114,6 +114,7 @@ const Annotation = ({shape, status, remove, edit}) => {
           </ListItemIcon>
           Cancel
         </MenuItem>
+
       </Menu>
 
     </a>

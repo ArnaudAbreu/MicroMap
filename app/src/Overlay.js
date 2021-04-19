@@ -36,14 +36,12 @@ const Overlay = ({hasposition, isVisible, isDrawing, layers, layergetter, annotS
   const draw = (elements) => {
     const listItems = elements.map((layer, idx) => {
         const sendLayer = (shapes) => {
-          console.log("sender: ", layer.label);
           return annotSetter(layer.label, shapes);
         }
         const getlayer = () => {
           return layergetter(layer.label);
         }
         const remover = (shape) => {
-          console.log("remover: ", shape);
           return annotRemover(layer.label, shape);
         }
         if (layer.visibility && isVisible) {
