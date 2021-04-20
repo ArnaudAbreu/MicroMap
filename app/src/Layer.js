@@ -63,16 +63,7 @@ const LayerTest = ({drawing, color, label, pos, send, request, remove}) => {
   const [shapeList, setShapeList] = useState([]);
   const [currentShape, setCurrentShape] = useState([]);
   const [hasNewShapes, setHasNewShapes] = useState(false);
-  const [testData, setTestData] = useState([]);
-  const [reqTest, setReqTest] = useState([]);
   const [idOpen, setIdOpen] = useState(false);
-
-  const getShapeList = async () => {
-    const response = await request();
-    let srv_annot = await response.data;
-    // console.log("requested annotations: ", srv_annot);
-    setShapeList(annotationsToShapeList(srv_annot.shapes));
-  }
 
   const removeAnnot = (annot) => {
     const annotations = shapeList.filter(item => item.id !== annot.id);
@@ -134,10 +125,16 @@ const LayerTest = ({drawing, color, label, pos, send, request, remove}) => {
   }
 
   useEffect(() => {
+    const getShapeList = async () => {
+      const response = await request();
+      let srv_annot = await response.data;
+      // console.log("requested annotations: ", srv_annot);
+      setShapeList(annotationsToShapeList(srv_annot.shapes));
+    }
     if (hasNewShapes === false){
       getShapeList();
     }
-  }, []);
+  }, [hasNewShapes, request]);
 
   const createNewNamedAnnot = (name) => {
     const annotobj = pointsToNamedAnnotationObj(currentShape, name);
@@ -270,24 +267,24 @@ const LayerTest = ({drawing, color, label, pos, send, request, remove}) => {
     }
   }
 
-  const handleContextMenu = (evt) => {
-    evt.preventDefault();
-    if (isDrawing && (currentShape.length > 0)) {
-      setIsDrawing(false);
-      // console.log("Finished current shape!", currentShape);
-      // before pushing anything to the list of annotation, we
-      // have to format the annotation
-      const annotobj = pointsToAnnotationObj(currentShape);
-      const updatedAnnotations = shapeList.slice();
-      updatedAnnotations.push(annotobj);
-      setShapeList(updatedAnnotations);
-      send(annotobj);
-      setHasNewShapes(true);
-      setCurrentShape([]);
-    }
-  }
+  // const handleContextMenu = (evt) => {
+  //   evt.preventDefault();
+  //   if (isDrawing && (currentShape.length > 0)) {
+  //     setIsDrawing(false);
+  //     // console.log("Finished current shape!", currentShape);
+  //     // before pushing anything to the list of annotation, we
+  //     // have to format the annotation
+  //     const annotobj = pointsToAnnotationObj(currentShape);
+  //     const updatedAnnotations = shapeList.slice();
+  //     updatedAnnotations.push(annotobj);
+  //     setShapeList(updatedAnnotations);
+  //     send(annotobj);
+  //     setHasNewShapes(true);
+  //     setCurrentShape([]);
+  //   }
+  // }
 
-  const handleContextMenuTest = (evt) => {
+  const handleContextMenu = (evt) => {
     evt.preventDefault();
     if (isDrawing && (currentShape.length > 0)) {
       setIsDrawing(false);
@@ -316,7 +313,7 @@ const LayerTest = ({drawing, color, label, pos, send, request, remove}) => {
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         onMouseMove={handleMove}
-        onContextMenu={handleContextMenuTest}
+        onContextMenu={handleContextMenu}
         tabIndex="0"
       >
       {annotationList(shapeList, currentShape)}

@@ -2,34 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { OpenSeaDragonViewer } from './OpenSeaDragonViewer';
 import { ToolBelt } from './ToolBelt';
 
-const addNoneAnnotation = (annotations) => {
-  const ann = annotations.slice();
-  ann.push({index: ann.length,
-               label: "None",
-               visibility: false,
-               color: "#9e9e9e",
-               disabled: false,
-               editing: false});
-  return ann;
-}
-
-const initAnnotations = (ann) => {
-  console.log("init annotation with: ", ann);
-  const annotations = ann.map((category, idx) => {
-    const annotState = {
-      index: category.id,
-      label: category.id,
-      visibility: false,
-      color: category.color,
-      disabled: false,
-      editing: false
-    };
-    return annotState;
-  })
-  return addNoneAnnotation(annotations);
-
-}
-
 const AnnotViewer = ({img, x, y,
                       overlay,
                       foundAnnots,
@@ -216,6 +188,35 @@ const AnnotViewer = ({img, x, y,
   }
 
   useEffect(() => {
+
+    const addNoneAnnotation = (annotations) => {
+      const ann = annotations.slice();
+      ann.push({index: ann.length,
+                   label: "None",
+                   visibility: false,
+                   color: "#9e9e9e",
+                   disabled: false,
+                   editing: false});
+      return ann;
+    }
+
+    const initAnnotations = (ann) => {
+      console.log("init annotation with: ", ann);
+      const annotations = ann.map((category, idx) => {
+        const annotState = {
+          index: category.id,
+          label: category.id,
+          visibility: false,
+          color: category.color,
+          disabled: false,
+          editing: false
+        };
+        return annotState;
+      })
+      return addNoneAnnotation(annotations);
+
+    }
+
     if ((foundAnnots === true && isInit === false) || (provided !== annots)){
       // console.log("re-initialize annotations in annotviewer !");
       setProvided(annots);
@@ -229,7 +230,7 @@ const AnnotViewer = ({img, x, y,
     // console.log("Annotation state: ", layerList);
     // console.log("re-render AnnotViewer");
     // console.log("-----------\n\n");
-  });
+  }, [foundAnnots, isInit, provided, annots]);
 
   const reInit = () => {
     setIsInit(false);

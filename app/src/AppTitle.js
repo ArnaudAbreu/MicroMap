@@ -1,11 +1,8 @@
 import React from "react";
-import SvgIcon from "@material-ui/core/SvgIcon";
 import Typography from '@material-ui/core/Typography';
-import Icon from '@material-ui/core/Icon';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
+import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Button from '@material-ui/core/Button';
-import MySvg from './microscope-1.svg';
 import Avatar from "@material-ui/core/Avatar";
 
 const useStyles = makeStyles({

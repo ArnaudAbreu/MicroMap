@@ -9,6 +9,25 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import Autocomplete from '@material-ui/lab/Autocomplete';
+
+const users = [
+  "Camille Franchet",
+  "Camille Laurent",
+  "Charlotte Syrykh",
+  "Kévin Cortacero",
+  "Marine Caranana",
+  "Pauline Gorez",
+  "Pierre Brousset",
+  "Pilar Ortega",
+  "Robin Schwob",
+  "Nathalie Van Acker",
+  "FX Frenois",
+  "Arnaud Abreu",
+  "John Wick",
+  "Luke Skywalker",
+  "Darth Vader"
+];
 
 
 const IdDialog = ({trigger, keepOpen, opened}) => {
@@ -26,10 +45,14 @@ const IdDialog = ({trigger, keepOpen, opened}) => {
     setOpen(false);
   }
 
+  const handleSelect = (evt, val, reason) => {
+    setPersonName(val);
+  }
+
   useEffect(() => {
     console.log("Debug Dialog Id: ");
     console.log("-----------");
-    console.log("Provided boolean: ", personName);
+    console.log("Provided str: ", personName);
     console.log("-----------\n\n");
   });
 
@@ -40,13 +63,28 @@ const IdDialog = ({trigger, keepOpen, opened}) => {
           <DialogContentText>
             To be able to write this annotation, please enter your name here.
           </DialogContentText>
-          <TextField
-            autoFocus
-            margin="dense"
-            id="name"
-            label="Enter your name or nickname plz"
-            fullWidth
-            onChange={changeInputStr}
+          <Autocomplete
+            id="free-solo-demo"
+            freeSolo
+            autoComplete
+            autoHighlight
+            autoSelect
+            options={users}
+            onChange={handleSelect}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                required
+                autoFocus
+                margin="dense"
+                id="name"
+                fullWidth
+                label="Enter your name or nickname plz"
+                variant="outlined"
+                InputProps={{ ...params.InputProps, type: 'search' }}
+                onChange={changeInputStr}
+                />
+            )}
           />
         </DialogContent>
         <DialogActions>

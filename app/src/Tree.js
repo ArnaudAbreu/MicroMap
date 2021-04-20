@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { reduce } from 'lodash';
 import FolderIcon from '@material-ui/icons/Folder';
 import FolderOpenIcon from '@material-ui/icons/FolderOpen';
 import InsertDriveFileIcon from '@material-ui/icons/InsertDriveFile';
-import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import TreeItem from '@material-ui/lab/TreeItem';
 import TreeView from '@material-ui/lab/TreeView';
 import Typography from '@material-ui/core/Typography';
 import { getFiles } from "./WSI";
 import './Tree.css';
-import { createMuiTheme, ThemeProvider, MuiThemeProvider } from '@material-ui/core/styles';
+import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 
 const useStyles = makeStyles({
   root: {
@@ -100,7 +98,7 @@ const FileNav = ({onFileClick, reset}) => {
       getInitialData();
       setIsInit(true);
     }
-  }, []);
+  }, [isInit]);
 
   const handleChange = (event, nodeId) => {
     getNodeData(nodeId[0]);

@@ -1,15 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import { AnnotViewer } from './AnnotViewer';
-import { WSIAPI, getSlide, getSlides } from "./WSI";
-import { FileNav } from './Tree';
+import { getSlide } from "./WSI";
 import {
-  AnnotationAPI,
   getLayer,
   getLayers,
-  createLayerGetter,
   createSlideSetter,
-  setLayer,
   createSlideRemover
 } from "./ANNOT";
 
