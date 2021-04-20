@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const ANNOT_URL = "http://"+process.env.REACT_APP_FLASK_SERVER_IP + ":" + process.env.REACT_APP_FLASK_SERVER_PORT;
+console.log("ANNOT API running at: ", ANNOT_URL);
 
 const AnnotationAPI = axios.create({
   baseURL: ANNOT_URL,
