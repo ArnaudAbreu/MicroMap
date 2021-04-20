@@ -12,9 +12,7 @@ import { createMuiTheme, MuiThemeProvider } from '@material-ui/core/styles';
 import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
-import DeleteForeverIcon from '@material-ui/icons/DeleteForever';
 import EditIcon from '@material-ui/icons/Edit';
-import CancelIcon from '@material-ui/icons/Cancel';
 import AccountCircleIcon from '@material-ui/icons/AccountCircle';
 import LayersIcon from '@material-ui/icons/Layers';
 
