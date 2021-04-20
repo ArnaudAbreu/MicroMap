@@ -24,14 +24,17 @@ const AnnotViewer = ({img, x, y,
     const response = await layergetter(name);
     let srv_layer = await response.data;
     console.log("requested layer: ", srv_layer);
-    // setShapeList(annotationsToShapeList(srv_annot.shapes));
+    console.log("ask to add layer: ", name);
 
-    annotations.push({index: srv_layer.id,
-                      label: name,
-                      visibility: false,
-                      color: srv_layer.color,
-                      disabled: false,
-                      editing: false});
+    if (srv_layer.shapes.length === 0) {
+      annotations.push({index: srv_layer.id,
+                        label: name,
+                        visibility: false,
+                        color: srv_layer.color,
+                        disabled: false,
+                        editing: false});
+    }
+
     annotations.push(noneAnnot);
     setLayerList(annotations);
   }
