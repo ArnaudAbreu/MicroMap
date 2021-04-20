@@ -41,8 +41,28 @@ const useStyles = makeStyles((theme) => ({
       duration: theme.transitions.duration.enteringScreen,
     }),
   },
-  menuButton: {
+  appBarShiftLeft: {
+    width: `calc(100% - ${drawerNavWidth}px)`,
+    marginRight: drawerNavWidth,
+    transition: theme.transitions.create(['margin', 'width'], {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  appBarShiftBoth: {
+    width: `calc(100% - ${drawerWidth + drawerNavWidth}px)`,
+    marginRight: drawerNavWidth,
+    marginLeft: drawerWidth,
+    transition: theme.transitions.create(['margin', 'width'], {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  },
+  menuButtonLeft: {
     marginRight: theme.spacing(2),
+  },
+  menuButtonRight: {
+    marginLeft: theme.spacing(2),
   },
   hide: {
     display: 'none',
@@ -142,6 +162,8 @@ const ToolBelt = ({
         position="fixed"
         className={clsx(classes.appBar, {
           [classes.appBarShift]: open,
+          [classes.appBarShiftLeft]: navOpen,
+          [classes.appBarShiftBoth]: open && navOpen,
         })}
       >
         <Toolbar>
@@ -150,7 +172,7 @@ const ToolBelt = ({
             aria-label="open drawer"
             onClick={handleDrawerOpen}
             edge="start"
-            className={clsx(classes.menuButton, open && classes.hide)}
+            className={clsx(classes.menuButtonLeft, open && classes.hide)}
           >
             <ChevronRightIcon />
           </IconButton>
@@ -160,7 +182,7 @@ const ToolBelt = ({
            aria-label="open drawer right"
            onClick={handleNavDrawerOpen}
            edge="start"
-           className={clsx(classes.menuButton, open && classes.hide)}
+           className={clsx(classes.menuButtonRight, navOpen && classes.hide)}
          >
            <ChevronLeftIcon />
          </IconButton>
