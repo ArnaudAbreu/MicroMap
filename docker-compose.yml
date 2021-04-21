@@ -16,7 +16,11 @@ services:
       - "${REACT_APP_FLASK_SERVER_PORT}:5000"
 
   app:
-    build: app
+    build:
+      args:
+        - REACT_APP_FLASK_SERVER_IP=${REACT_APP_FLASK_SERVER_IP}
+        - REACT_APP_FLASK_SERVER_PORT=${REACT_APP_FLASK_SERVER_PORT}
+      context: app
     command: "npm start"
     volumes:
       - ./app:/app
