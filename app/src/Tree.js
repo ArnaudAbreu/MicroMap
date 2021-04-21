@@ -32,6 +32,7 @@ const theme = createMuiTheme({
 });
 
 const defaultFile = {
+  name: "",
   authors: [""],
   shapes: 0,
   layers: [{id: ""}]
@@ -128,6 +129,19 @@ const FileNav = ({onFileClick, reset}) => {
     return (`Authors: ${listItems}`);
   }
 
+  const writeCtxtFullName = (file) => {
+    return (
+      <div style={{overflow: "auto", textOverflow: "auto"}}>
+        <MuiThemeProvider theme={theme}>
+          <Typography noWrap color='secondary'>
+            {`Name: ${file.name}`}
+          </Typography>
+        </MuiThemeProvider>
+      </div>
+
+    );
+  }
+
   const writeCtxtLayers = (file) => {
     return (
       <div style={{overflow: "auto", textOverflow: "auto"}}>
@@ -217,6 +231,7 @@ const FileNav = ({onFileClick, reset}) => {
           nodeId={file.path}
           label={writeLabel(file.name, file.path)}
           onLabelClick={onClickLeaf}
+          onContextMenu={onRightClickLeaf}
           icon={<InsertDriveFileIcon/>}>
         </TreeItem>
       );
@@ -267,6 +282,12 @@ const FileNav = ({onFileClick, reset}) => {
         open={Boolean(ctxt)}
         onClose={handleCloseCtxt}>
 
+        <MenuItem onClick={handleCloseCtxt}>
+          <ListItemIcon>
+            <InsertDriveFileIcon fontSize="small" />
+          </ListItemIcon>
+          {writeCtxtFullName(ctxtItem)}
+        </MenuItem>
         <MenuItem onClick={handleCloseCtxt}>
           <ListItemIcon>
             <LayersIcon fontSize="small" />
