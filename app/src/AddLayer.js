@@ -48,6 +48,7 @@ const BasicTextFields = ({addLayer}) => {
   const changeLayerName = () => {
     const name = layerName;
     addLayer(name);
+    setLayerName("");
   }
 
   return (
@@ -62,6 +63,7 @@ const BasicTextFields = ({addLayer}) => {
               InputLabelProps={{
                 className: classes.label,
               }}
+              value={layerName}
               onChange={changeInputStr} />
             </ThemeProvider>
           </Grid>

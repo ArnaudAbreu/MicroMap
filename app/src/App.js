@@ -34,10 +34,10 @@ function App() {
   }
 
   useEffect(() => {
-    console.log("Debug App: ");
-    console.log("-----------");
-    console.log("Annotation layers: ", annotLayers);
-    console.log("-----------\n\n");
+    // console.log("Debug App: ");
+    // console.log("-----------");
+    // console.log("Annotation layers: ", annotLayers);
+    // console.log("-----------\n\n");
   });
 
   const layerGetter = (path, name) => {

@@ -22,7 +22,7 @@ def get_annotation_path(folder, slide_id):
     return os.path.join(folder, "{}.json".format(slide_base))
 
 
-def get_annotation_from_json_path(jsonpath, slide_id):
+def get_annotation_from_json_path(jsonpath, slide_id, write_permission=True):
     """
     Read a dictionary from jsonpath.
 
@@ -40,8 +40,9 @@ def get_annotation_from_json_path(jsonpath, slide_id):
         "slide_id": slide_id,
         "layers": []
     }
-    with open(jsonpath, "w") as f:
-        json.dump(annot, f)
+    if write_permission:
+        with open(jsonpath, "w") as f:
+            json.dump(annot, f)
     return annot, False
 
 

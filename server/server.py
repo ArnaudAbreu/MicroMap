@@ -142,6 +142,27 @@ def abort_if_format_does_not_exist(fmt):
         abort(404, message="Format {} is not supported".format(fmt))
 
 
+def get_annot_info(annot_file, slide_id):
+    """Get layers in the annotation."""
+    logger.info("calling info on file: {}".format(annot_file))
+    annot, existed = get_annotation_from_json_path(
+        annot_file, slide_id, write_permission=False
+    )
+    layers = []
+    shapes = 0
+    authors = set()
+    try:
+        for layer in annot["layers"]:
+            layer_info = {k: v for k, v in layer.items() if k != 'shapes'}
+            layers.append(layer_info)
+            shapes += len(layer["shapes"])
+            layer_authors = set([shape["author"] for shape in layer["shapes"]])
+            authors |= layer_authors
+    except Exception:
+        logger.warning("Found invalid annotation file!")
+    return {"layers": layers, "shapes": shapes, "authors": list(authors)}
+
+
 class PILBytesIO(BytesIO):
     """
     Turn pil image into bytesself.
@@ -343,12 +364,16 @@ class SlideTree(Resource):
                 }
             )
         for slide, annot in zip(slides, annots):
+            annot_info = get_annot_info(annot, os.path.basename(slide))
             res.append(
                 {
                     "type": "file",
                     "name": os.path.basename(slide),
                     "path": os.path.relpath(slide, ROOT_WSI),
-                    "annotated": os.path.exists(annot)
+                    "annotated": (annot_info["shapes"] > 0),
+                    "authors": annot_info["authors"],
+                    "layers": annot_info["layers"],
+                    "shapes": annot_info["shapes"]
                 }
             )
         return res, 201
