@@ -97,7 +97,7 @@ const OpenSeaDragonViewer = ({
   }
 
   return (
-    <div style={{position: "relative", height: fmt(y), width: fmt(x), overflow: "hidden"}}>
+    <div style={{position: "absolute", height: fmt(y), width: "100%", overflow: "hidden"}}>
       <div id="openSeaDragon" className = "viewer"
         style={{height: "100%", width: "100%"}} >
       </div>

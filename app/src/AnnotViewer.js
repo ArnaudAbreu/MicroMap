@@ -240,7 +240,7 @@ const AnnotViewer = ({img, x, y,
   }
 
   return(
-    <div>
+    <div style={{display: "flex"}}>
       <div>
         <ToolBelt classList={layerList}
                   displayOnSwitch={changeDisplay}
