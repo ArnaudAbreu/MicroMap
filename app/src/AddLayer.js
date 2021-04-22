@@ -47,8 +47,16 @@ const BasicTextFields = ({addLayer}) => {
   }
   const changeLayerName = () => {
     const name = layerName;
-    addLayer(name);
-    setLayerName("");
+    if (name.length > 0){
+      addLayer(name);
+      setLayerName("");
+    }
+  }
+  const preventEnter = (evt) => {
+    if (evt.keyCode === 13) {
+      console.log("You pressed enter !");
+      changeLayerName();
+    }
   }
 
   return (
@@ -64,6 +72,7 @@ const BasicTextFields = ({addLayer}) => {
                 className: classes.label,
               }}
               value={layerName}
+              onKeyDown={preventEnter}
               onChange={changeInputStr} />
             </ThemeProvider>
           </Grid>
