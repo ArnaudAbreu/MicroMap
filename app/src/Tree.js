@@ -77,6 +77,14 @@ const FileNav = ({onFileClick, reset}) => {
     setCtxtItem(defaultFile);
   };
 
+  const handleOpenFromCtxt = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    handleSlideClick(ctxtItem);
+    setCtxt(null);
+    setCtxtItem(defaultFile);
+  };
+
   const getInitialData = async () => {
     const response = await getFiles("");
     let root_folders = await response.data;
@@ -282,7 +290,7 @@ const FileNav = ({onFileClick, reset}) => {
         open={Boolean(ctxt)}
         onClose={handleCloseCtxt}>
 
-        <MenuItem onClick={handleCloseCtxt}>
+        <MenuItem onClick={handleOpenFromCtxt}>
           <ListItemIcon>
             <InsertDriveFileIcon fontSize="small" />
           </ListItemIcon>
