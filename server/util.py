@@ -5,6 +5,13 @@ Find slide files in folders and all.
 """
 import os
 
+
+class NotADirectoryError(Exception):
+    """Raise when expecting directory."""
+
+    pass
+
+
 AUTH_FILE_EXT = [
     ".mrxs",
     ".svs",
@@ -23,7 +30,7 @@ def filtered_paths(paths):
     return res
 
 
-def children(folder):
+def raw_children(folder):
     """Find authorized children of a folder."""
     folders = []
     files = []
@@ -31,6 +38,34 @@ def children(folder):
         path = os.path.join(folder, name)
         if os.path.isdir(path):
             folders.append(path)
+        else:
+            files.append(path)
+    return sorted(folders), sorted(files)
+
+
+def has_slides(folder):
+    """Return True folder only if it leads to slide files."""
+    folders, files = raw_children(folder)
+    files = filtered_paths(files)
+    if len(files) > 0:
+        return True
+    if len(folders) > 0:
+        for subfolder in folders:
+            has_slides_ = has_slides(subfolder)
+            if has_slides_:
+                return True
+    return False
+
+
+def children(folder):
+    """Find authorized children of a folder."""
+    folders = []
+    files = []
+    for name in os.listdir(folder):
+        path = os.path.join(folder, name)
+        if os.path.isdir(path):
+            if has_slides(path):
+                folders.append(path)
         else:
             files.append(path)
     files = filtered_paths(files)
