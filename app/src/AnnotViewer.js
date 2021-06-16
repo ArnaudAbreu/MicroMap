@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { OpenSeaDragonViewer } from './OpenSeaDragonViewer';
 import { ToolBelt } from './ToolBelt';
+import { DataTabs } from './DataTabs';
 
-const AnnotViewer = ({img, x, y,
+const AnnotViewer = ({img, ratio,
                       overlay,
                       foundAnnots,
                       annots,
                       resetSlide,
                       layergetter,
                       annotSetter,
-                      annotRemover}) => {
+                      annotRemover,
+                      cohortGetter
+                    }) => {
 
   const [layerList, setLayerList] = useState([]);
   const [isInit, setIsInit] = useState(false);
@@ -240,28 +243,28 @@ const AnnotViewer = ({img, x, y,
   }
 
   return(
-    <div style={{display: "flex"}}>
-      <div>
-        <ToolBelt classList={layerList}
-                  displayOnSwitch={changeDisplay}
-                  editOnRadioChange={changeEdit}
-                  resetSlide={resetSlide}
-                  resetInit={reInit}
-                  addLayer={addLayer}
-                  />
+      <div style={{display: "flex"}}>
+        <div>
+          <ToolBelt classList={layerList}
+                    displayOnSwitch={changeDisplay}
+                    editOnRadioChange={changeEdit}
+                    resetSlide={resetSlide}
+                    resetInit={reInit}
+                    addLayer={addLayer}
+                    />
+        </div>
+          <OpenSeaDragonViewer
+            image={img}
+            ratio={ratio}
+            overlay={!displayNone}
+            drawing={!editNone}
+            layers={layerList}
+            layergetter={layergetter}
+            annotSetter={annotSetter}
+            annotRemover={annotRemover}
+            cohortGetter={cohortGetter}
+          />
       </div>
-      <OpenSeaDragonViewer
-        image={img}
-        x={x}
-        y={y}
-        overlay={!displayNone}
-        drawing={!editNone}
-        layers={layerList}
-        layergetter={layergetter}
-        annotSetter={annotSetter}
-        annotRemover={annotRemover}
-      />
-    </div>
   );
 
 }

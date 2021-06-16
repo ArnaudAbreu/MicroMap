@@ -1,24 +1,25 @@
 import OpenSeaDragon from "openseadragon";
 import OpenSeadragon from "openseadragon";
-import { Overlay } from "./Overlay"
+import { Overlay } from "./Overlay";
 import React, {
   useEffect,
   useState
 } from "react";
+import { DataTabs } from './DataTabs';
 
 
 
 const OpenSeaDragonViewer = ({
   image,
-  x,
-  y,
+  ratio,
   overlay,
   drawing,
   layers,
   isNone,
   layergetter,
   annotSetter,
-  annotRemover
+  annotRemover,
+  cohortGetter
 }) => {
 
   const [hasViewer, setHasViewer] = useState(false);
@@ -97,20 +98,26 @@ const OpenSeaDragonViewer = ({
   }
 
   return (
-    <div style={{position: "absolute", height: fmt(y), width: "100%", overflow: "hidden"}}>
-      <div id="openSeaDragon" className = "viewer"
-        style={{height: "100%", width: "100%"}} >
+    <div style={{position: "absolute", height: "100%", width: "100%", overflow: "hidden"}}>
+      <div style={{position: "absolute", height: "60%", width: "100%", overflow: "hidden"}}>
+        <div id="openSeaDragon" className = "viewer"
+          style={{ height: "100%", width: "100%"}} >
+        </div>
+        {hasViewer ? <Overlay
+                      id="overlay"
+                      hasposition={overlayPos}
+                      isVisible={overlay}
+                      isDrawing={drawing}
+                      layers={layers}
+                      layergetter={layergetter}
+                      annotSetter={annotSetter}
+                      annotRemover={annotRemover}/> : null}
       </div>
-      {hasViewer ? <Overlay
-                    id="overlay"
-                    hasposition={overlayPos}
-                    isVisible={overlay}
-                    isDrawing={drawing}
-                    layers={layers}
-                    layergetter={layergetter}
-                    annotSetter={annotSetter}
-                    annotRemover={annotRemover}/> : null}
+      <div style={{ position: "absolute", height: "40%", width: "100%", overflow: "hidden", top: "60%"}}>
+        <DataTabs cohortGetter={cohortGetter}/>
+      </div>
     </div>
+
   );
 }
 

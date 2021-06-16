@@ -8,12 +8,15 @@ import {
   createSlideSetter,
   createSlideRemover
 } from "./ANNOT";
+import { getCohort } from "./DATA";
+
 
 
 function App() {
 
-  const x = 1200;
-  const y = 800;
+  const viewer_ratio = 60;
+  const [isInit, setIsInit] = useState(false);
+  const [cohort, setCohort] = useState();
   const [selectedSrvImage, setSelectedSrvImage] = useState();
   const [annotLayers, setAnnotLayers] = useState([]);
   const [foundAnnotations, setFoundAnnotations] = useState(false);
@@ -33,7 +36,18 @@ function App() {
     setSlideName(slidename);
   }
 
+  const getCohortCsv = async () => {
+    const response = await getCohort();
+    let csvData = await response.data;
+    setCohort(csvData);
+    console.log("requested csv: ", csvData);
+  }
+
   useEffect(() => {
+    if (isInit === false){
+      getCohortCsv();
+      setIsInit(true);
+    }
     // console.log("Debug App: ");
     // console.log("-----------");
     // console.log("Annotation layers: ", annotLayers);
@@ -49,18 +63,16 @@ function App() {
 
   return (
     <div className="App" style={{ display: "flex", justifyContent:'space-between' }}>
-      <div>
         <AnnotViewer img={selectedSrvImage}
-                     x={x}
-                     y={y}
+                     ratio={viewer_ratio}
                      annots={annotLayers}
                      foundAnnots={foundAnnotations}
                      resetSlide={getSrvImage}
                      layergetter={layerGetter(slidePath, slideName)}
                      annotSetter={createSlideSetter(slidePath, slideName)}
                      annotRemover={createSlideRemover(slidePath, slideName)}
+                     cohortGetter={cohort}
                      />
-      </div>
     </div>
   );
 }

@@ -16,6 +16,7 @@ from openslide.deepzoom import DeepZoomGenerator
 import ast
 from util import children, annots_from_slide
 import logging
+import pandas as pd
 
 
 logger = logging.getLogger(__name__)
@@ -344,7 +345,7 @@ class SlideTree(Resource):
     """A class to handle file navigation requests."""
 
     def post(self):
-        """Answer GET requests."""
+        """Answer POST requests."""
         args = path_parser.parse_args()
         path = args.path
         logger.info("requested path: {}".format(path))
@@ -379,6 +380,27 @@ class SlideTree(Resource):
         return res, 201
 
 
+class Cohort(Resource):
+    """A class to handle cohort csv requests."""
+
+    def get(self):
+        """Answer GET requests."""
+        df = pd.read_csv(os.path.join(ROOT_ANNOTS, "cohort.csv"))
+        row_count = df.shape[0]
+        column_count = df.shape[1]
+        column_names = df.columns.tolist()
+        final_row_data = []
+        for index, rows in df.iterrows():
+            final_row_data.append(rows.to_dict())
+        resp = {
+            'rows': row_count,
+            'cols': column_count,
+            'columns': column_names,
+            'rowData': final_row_data
+        }
+        return resp
+
+
 api.add_resource(SlideTree, "/nav/")
 api.add_resource(SlideList, "/slides")
 api.add_resource(Slide, "/slides/<slide_ID>")
@@ -387,6 +409,7 @@ api.add_resource(LayerList, "/layers/<slide_id>")
 api.add_resource(Layer, "/layers/<slide_id>/<layer_id>")
 api.add_resource(SlideAnnotation, "/annotations/<slide_id>")
 api.add_resource(Annotation, "/annotations/<slide_id>/<layer_id>")
+api.add_resource(Cohort, "/cohort")
 
 
 if __name__ == "__main__":
