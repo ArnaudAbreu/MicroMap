@@ -187,7 +187,7 @@ const DataTabs = ({cohortGetter}) => {
     <div className={classes.root}>
       <Paper square >
         <Tabs
-          style={{ backgroundColor: "#3b414d", color: "#fff" }}
+          style={{backgroundColor: "#3b414d", color: "#fff" }}
           value={value}
           indicatorColor="primary"
           textColor="primary"
