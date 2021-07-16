@@ -41,6 +41,9 @@ def get_annotation_from_json_path(jsonpath, slide_id, write_permission=True):
         "layers": []
     }
     if write_permission:
+        folders = os.path.dirname(jsonpath)
+        if not os.path.exists(folders):
+            os.makedirs(folders)
         with open(jsonpath, "w") as f:
             json.dump(annot, f)
     return annot, False
